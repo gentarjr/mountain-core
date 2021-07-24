@@ -70,9 +70,11 @@ public class UserAuthController {
 
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
-            userRepo.findByPhoneNumberAndRole(phoneNumber, tipeUser).orElseThrow(() -> {
+            User u = userRepo.findByPhoneNumberAndRole(phoneNumber, tipeUser);
+
+            if(u != null){
                 throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Phone number already registered");
-            });
+            }
 
 
             log.info("chek login success {}", phoneNumber);

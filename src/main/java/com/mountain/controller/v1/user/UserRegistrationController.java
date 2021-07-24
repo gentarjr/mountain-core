@@ -136,9 +136,10 @@ public class UserRegistrationController {
                 throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, "Combination pin invalid");
             }
 
-            userRepo.findByPhoneNumberAndRole(phoneNumber, roleUser).ifPresent(p -> {
+            User u = userRepo.findByPhoneNumberAndRole(phoneNumber, roleUser);
+            if(u != null){
                 throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Phone number already registered");
-            });
+            }
 
             if (StringUtils.isNotEmpty(email)) {
                 userRepo.findByEmailAndRole(email, roleUser).ifPresent(p -> {

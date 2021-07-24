@@ -12,7 +12,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     Optional<User> findByPhoneNumberOrEmailOrIdCardAndRole(String phoneNumber, String email, String idCard, ERole roleUser);
 
-    Optional<User> findByPhoneNumberAndRole(String phoneNumber, ERole roleUser);
+    User findByPhoneNumberAndRole(String phoneNumber, ERole roleUser);
 
     Optional<User> findByEmailAndRole(String email, ERole roleUser);
 
