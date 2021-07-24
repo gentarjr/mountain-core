@@ -79,7 +79,7 @@ public class MountainController {
             User u = userRepo.findById(id);
 
             if(u == null || u.getRoleName().equals("")){
-                throw new NonexistentEntityException(ErrCode.INF_USEREMPTY, "User not listed");
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
             ValidationUtils.rejectIfEmptyField(" Cannot be empty",
@@ -116,8 +116,8 @@ public class MountainController {
                 transaction.rollback();
             }
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         } finally {
@@ -149,7 +149,7 @@ public class MountainController {
             User u = userRepo.findById(id);
 
             if(u == null || u.getRoleName().equals("")){
-                throw new NonexistentEntityException(ErrCode.INF_USEREMPTY, "User not listed");
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
             ValidationUtils.rejectIfEmptyField(" Cannot be empty",
@@ -160,7 +160,7 @@ public class MountainController {
             RequestMountain requestMountain = requestMountainRepo.findByTransaction(tr);
 
             if(requestMountain.getStatus().equals("VERIFIED")){
-                throw new NonexistentEntityException(ErrCode.INF_FIELDEMPTY, "User has not verified");
+                throw new NonexistentEntityException(ErrCode.UNUSED, "User has not verified");
             }
 
             App.AppCode nameApp = App.AppCode.MOUNTAIN;
@@ -191,8 +191,8 @@ public class MountainController {
                 transaction.rollback();
             }
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         } finally {

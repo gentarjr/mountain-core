@@ -22,13 +22,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ResponseEnvelopeV2<?>> handleConstraintViolationException(ConstraintViolationException ex) {
         ConstraintViolation<?> violation = ex.getConstraintViolations().stream().findFirst().orElse(null);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseEnvelopeV2<>(String.valueOf(ErrCode.ERR_NOTFOUND.getCode()), violation != null ? violation.getMessage() : "Bad Request"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseEnvelopeV2<>(String.valueOf(ErrCode.NOT_FOUND.getCode()), violation != null ? violation.getMessage() : "Bad Request"));
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(FileNotFoundException.class)
     protected ResponseEntity<ResponseEnvelope> handleFileNotFoundException(FileNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseEnvelope(ErrCode.ERR_NOTFOUND.getCode(), ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseEnvelope(ErrCode.NOT_FOUND.getCode(), ex.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -40,7 +40,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ResponseEnvelope> handleGeneralException() {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseEnvelope(ErrCode.ERR_UNKNOWN.getCode(), ErrCode.ERR_UNKNOWN.getMessage()));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseEnvelope(ErrCode.NO_CONTENT.getCode(), ErrCode.NO_CONTENT.getMessage()));
     }
 
 }

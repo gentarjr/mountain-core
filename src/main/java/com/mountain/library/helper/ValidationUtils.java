@@ -17,7 +17,7 @@ public class ValidationUtils {
     public static void checkEmptyField(String... fields) throws EmptyFieldException {
         for (String f : fields) {
             if(StringUtils.isEmpty(f)){
-                throw new EmptyFieldException(ErrCode.INF_FIELDEMPTY, "Field tidak boleh kosong");
+                throw new EmptyFieldException(ErrCode.NO_CONTENT, "Field tidak boleh kosong");
             }
         }
     }
@@ -29,7 +29,7 @@ public class ValidationUtils {
     public static void rejectIfEmptyField(String defaultMessage, String[]... fields) throws EmptyFieldException{
         for (String[] f : fields) {
             if(StringUtils.isEmpty( f[1] )){
-                throw new EmptyFieldException(ErrCode.INF_FIELDEMPTY, f[0] + defaultMessage);
+                throw new EmptyFieldException(ErrCode.NO_CONTENT, f[0] + defaultMessage);
             }
         }
     }
@@ -37,7 +37,7 @@ public class ValidationUtils {
     public static void checkWhitespaceField(String... fields) throws InvalidFieldException {
         for (String f : fields) {
             if(StringUtils.containsWhitespace(f)){
-                throw new InvalidFieldException(ErrCode.INF_FIELDSPACE, "Field tidak boleh mengandung whitespace");
+                throw new InvalidFieldException(ErrCode.WITH_SPACE, "Field tidak boleh mengandung whitespace");
             }
         }
     }
@@ -49,7 +49,7 @@ public class ValidationUtils {
     public static void rejectIfWhitespaceField(String defaultMessage, String[]... fields) throws InvalidFieldException {
         for (String[] f : fields) {
             if (StringUtils.containsWhitespace(f[1])) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDSPACE, f[0] + defaultMessage);
+                throw new InvalidFieldException(ErrCode.WITH_SPACE, f[0] + defaultMessage);
             }
         }
     }
@@ -57,7 +57,7 @@ public class ValidationUtils {
     public static void rejectIfNotAlphanumeric(String defaultMessage, String[]... fields) throws InvalidFieldException {
         for (String[] f : fields) {
             if (!StringUtils.isAlphanumericSpace(f[1])) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, f[0] + defaultMessage);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, f[0] + defaultMessage);
             }
         }
     }
@@ -68,7 +68,7 @@ public class ValidationUtils {
         errMesg = StringUtils.isEmpty(errMesg) ? "Email tidak valid" : errMesg;
         EmailValidator emailValidator = EmailValidator.getInstance();
         if (StringUtils.isNotEmpty(email) && !emailValidator.isValid(email)) {
-            throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+            throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
         }//end of if
     }
 
@@ -86,7 +86,7 @@ public class ValidationUtils {
             try {
                 localDate = DateUtils.parseDate(date, pattern);
             } catch (Exception e) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
             }
         }//end of if
     }
@@ -100,7 +100,7 @@ public class ValidationUtils {
             try {
                 localDate = DateUtils.parseDate(date, AppConstant.DEFAULT_FORMAT_TANGGAL);
             } catch (Exception e) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
             }
         }//end of if
     }
@@ -115,7 +115,7 @@ public class ValidationUtils {
             try {
                 localTime = DateUtils.parseTime(time, AppConstant.DEFAULT_FORMAT_TIME);
             } catch (Exception e) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
             }
         }//end of if
     }
@@ -129,7 +129,7 @@ public class ValidationUtils {
             try {
                 Long.parseLong(number);
             } catch (NumberFormatException e) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
             }
         }//end of if
     }
@@ -143,7 +143,7 @@ public class ValidationUtils {
             try {
                 Double.parseDouble(number);
             } catch (NumberFormatException e) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMesg);
+                throw new InvalidFieldException(ErrCode.NO_CONTENT, errMesg);
             }
         }//end of if
     }
@@ -162,7 +162,7 @@ public class ValidationUtils {
                 return;
             }
         }
-        throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMessage);
+        throw new InvalidFieldException(ErrCode.NO_CONTENT, errMessage);
     }
 
     public static void validateBoolean(String val, String errMessage)
@@ -180,7 +180,7 @@ public class ValidationUtils {
                 return;
             }
         }
-        throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, errMessage);
+        throw new InvalidFieldException(ErrCode.NO_CONTENT, errMessage);
     }
 
     public static void validateTipeUser(String val)throws InvalidFieldException{

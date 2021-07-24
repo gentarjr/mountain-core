@@ -33,7 +33,7 @@ public class ApiUserAuthEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-        ErrCode errCode = ErrCode.ERR_BADCRADENTIAL;
+        ErrCode errCode = ErrCode.BAD_GATEWAY;
         if (authException instanceof JwtTokenException) {
             JwtTokenException ex = (JwtTokenException) authException;
             errCode = ex.getErrCode();

@@ -32,7 +32,7 @@ public class MountainServiceImpl implements MountainService {
         User u = userRepo.findById(id);
 
         if(u == null){
-            throw new NonexistentEntityException(ErrCode.INF_USEREMPTY, "User not listed");
+            throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
         }
 
         List<RequestMountainResponse> requestMountainResponse;

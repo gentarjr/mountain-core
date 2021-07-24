@@ -45,7 +45,7 @@ public class MountainCoreServiceFeignClientConfig {
                     String errMessage = respEnvelope.getMeta().getMessage();
                     return new WinterfellException(errCode, errMessage);
                 }
-                return new WinterfellException(ErrCode.ERR_UNKNOWN, ErrCode.ERR_UNKNOWN.getMessage());
+                return new WinterfellException(ErrCode.NO_CONTENT, ErrCode.NO_CONTENT.getMessage());
             } catch (Exception e) {
                 return e;
             }

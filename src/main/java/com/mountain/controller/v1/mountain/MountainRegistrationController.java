@@ -63,7 +63,7 @@ public class MountainRegistrationController {
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
             userRepo.findByPhoneNumberOrEmailOrIdCardAndRoleName(phoneNumber, email, idCard,role).ifPresent(p -> {
-                throw new PreexistingUserException(ErrCode.INF_FIELDINVALID, "Phone number or email or idCard already registered");
+                throw new PreexistingUserException(ErrCode.NOT_ACCEPTABLE, "Phone number or email or idCard already registered");
             });
 
             log.info("Phone number {}, email {}, type {} can not be registered", phoneNumber, email, role);
@@ -74,8 +74,8 @@ public class MountainRegistrationController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }
@@ -105,7 +105,7 @@ public class MountainRegistrationController {
             RoleMountain r = roleMountainRepo.findByRoleName(rolesName);
 
             if (r != null) {
-                throw new PreexistingUserException(ErrCode.INF_FIELDINVALID, "Roles has been registered");
+                throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Roles has been registered");
             }
             if(rolesName.equals("USER")){
                 Role.ERole tipeUser = Role.ERole.valueOf(rolesName.toUpperCase());
@@ -124,8 +124,8 @@ public class MountainRegistrationController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.CONFLICT;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }
@@ -175,11 +175,11 @@ public class MountainRegistrationController {
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
             if (!pin.equals(confirmationPin)) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, "Combination pin invalid");
+                throw new InvalidFieldException(ErrCode.NOT_ACCEPTABLE, "Combination pin invalid");
             }
 
             userRepo.findByPhoneNumberAndRoleName(phoneNumber, role).ifPresent(p -> {
-                throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Phone number already registered");
+                throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Phone number already registered");
             });
 
             Set<RoleMountain> roles = new HashSet<>();
@@ -202,8 +202,8 @@ public class MountainRegistrationController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }

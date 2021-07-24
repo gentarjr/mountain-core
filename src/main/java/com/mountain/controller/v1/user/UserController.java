@@ -71,7 +71,7 @@ public class UserController {
             User u = userDao.findUser(id);
 
             if (u == null) {
-                throw new NonexistentEntityException(ErrCode.INF_USEREMPTY, "User not listed");
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
             Integer backPack = equipmentForm.getBackPack();
@@ -141,8 +141,8 @@ public class UserController {
                 transaction.rollback();
             }
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         } finally {

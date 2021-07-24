@@ -31,7 +31,7 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
 
         ResponseEnvelope rm =
                 new ResponseEnvelope(
-                        ErrCode.ERR_FORBIDDEN.getCode(),
+                        ErrCode.FORBIDDEN.getCode(),
                         "Forbidden Access");
 
         try (PrintWriter out = response.getWriter()) {

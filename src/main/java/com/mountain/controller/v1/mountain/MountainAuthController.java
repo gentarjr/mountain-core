@@ -65,7 +65,7 @@ public class MountainAuthController {
 
             User u = userRepo.findByPhoneNumberAndRole(phoneNumber, tipeUser);
             if(u != null){
-                throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Phone number already registered");
+                throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Phone number already registered");
             }
 
             log.info("chek login success {}", phoneNumber);
@@ -76,8 +76,8 @@ public class MountainAuthController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }
@@ -105,14 +105,14 @@ public class MountainAuthController {
             User u = principalRepo.findByPhoneNumberAndRoleName(phoneNumber, role);
 
             if (u == null) {
-                throw new NonexistentEntityException(ErrCode.INF_USEREMPTY, "User not listed");
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
             ValidationUtils.rejectIfEmptyField(" Cannot be empty",
                     new String[][]{{"Phone number", phoneNumber}, {"PIN", password}});
 
             if (!CodecUtils.isPasswordMatch(password, u.getPin())) {
-                throw new ForbiddenOperationException(ErrCode.ERR_BADCRADENTIAL, "PIN you entered is wrong");
+                throw new ForbiddenOperationException(ErrCode.NOT_ACCEPTABLE, "PIN you entered is wrong");
             }
 
             UserResponse userResponse;
@@ -136,8 +136,8 @@ public class MountainAuthController {
                 transaction.rollback();
             }
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
             log.warn("Exception Caught :", e);
         } finally {
             if (em.isOpen()) {

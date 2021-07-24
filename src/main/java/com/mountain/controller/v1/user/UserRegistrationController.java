@@ -65,7 +65,7 @@ public class UserRegistrationController {
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
             userRepo.findByPhoneNumberOrEmailOrIdCardAndRole(phoneNumber, email, idCard, roleUser).ifPresent(p -> {
-                throw new PreexistingUserException(ErrCode.INF_FIELDINVALID, "Phone number or email or idCard already registered");
+                throw new PreexistingUserException(ErrCode.NOT_ACCEPTABLE, "Phone number or email or idCard already registered");
             });
 
             log.info("Phone number {}, email {}, type {} can not be registered", phoneNumber, email, roleUser);
@@ -76,8 +76,8 @@ public class UserRegistrationController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }
@@ -133,17 +133,17 @@ public class UserRegistrationController {
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
             if (!pin.equals(confirmationPin)) {
-                throw new InvalidFieldException(ErrCode.INF_FIELDINVALID, "Combination pin invalid");
+                throw new InvalidFieldException(ErrCode.NOT_ACCEPTABLE, "Combination pin invalid");
             }
 
             User u = userRepo.findByPhoneNumberAndRole(phoneNumber, roleUser);
             if(u != null){
-                throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Phone number already registered");
+                throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Phone number already registered");
             }
 
             if (StringUtils.isNotEmpty(email)) {
                 userRepo.findByEmailAndRole(email, roleUser).ifPresent(p -> {
-                    throw new PreexistingUserException(ErrCode.INF_USERNOTEMPTY, "Email already registered");
+                    throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Email already registered");
                 });
             }
 
@@ -167,8 +167,8 @@ public class UserRegistrationController {
             log.warn("Exception Caught :", e);
         } catch (Exception e) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            rm.setCode(ErrCode.ERR_UNKNOWN.getCode());
-            rm.setMessage(ErrCode.ERR_UNKNOWN.getMessage());
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
 
             log.warn("Exception Caught :", e);
         }
