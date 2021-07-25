@@ -1,6 +1,6 @@
 package com.mountain.dao;
 
-import com.mountain.entity.user.User;
+import com.mountain.entity.detail.Mountain;
 import com.mountain.library.exceptions.NonexistentEntityException;
 import com.mountain.library.exceptions.PreexistingEntityException;
 import org.springframework.stereotype.Service;
@@ -10,20 +10,20 @@ import javax.persistence.EntityNotFoundException;
 import java.io.Serializable;
 
 @Service
-public class UserDao extends AbstractDao implements Serializable {
+public class MountainDao extends AbstractDao implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public void create(User user) throws Exception {
+    public void create(Mountain mountain) throws Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            em.persist(user);
+            em.persist(mountain);
             em.getTransaction().commit();
         } catch (Exception e) {
-            if (findUser(user.getId()) != null) {
-                throw new PreexistingEntityException("User " + user + " already exists.", e);
+            if (findMountain(mountain.getId()) != null) {
+                throw new PreexistingEntityException("Mountain " + mountain + " already exists.", e);
             }
         } finally {
             if (em != null) {
@@ -32,19 +32,19 @@ public class UserDao extends AbstractDao implements Serializable {
         }
     }
 
-    public void edit(User user) throws Exception {
+    public void edit(Mountain mountain) throws Exception {
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            user = em.merge(user);
+            mountain = em.merge(mountain);
             em.getTransaction().commit();
         } catch (Exception e) {
             String msg = e.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                String id = user.getId();
-                if (findUser(id) == null) {
-                    throw new NonexistentEntityException("The User with id " + id + " no longer exists");
+                String id = mountain.getId();
+                if (findMountain(id) == null) {
+                    throw new NonexistentEntityException("The Mountain with id " + id + " no longer exists");
                 }
             }
             throw e;
@@ -60,14 +60,14 @@ public class UserDao extends AbstractDao implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            User user;
+            Mountain mountain;
             try {
-                user = em.getReference(User.class, id);
-                user.getId();
+                mountain = em.getReference(Mountain.class, id);
+                mountain.getId();
             } catch (EntityNotFoundException ex) {
-                throw new NonexistentEntityException("The User with id " + id + " no longer exists.", ex);
+                throw new NonexistentEntityException("The Mountain with id " + id + " no longer exists.", ex);
             }
-            em.remove(user);
+            em.remove(mountain);
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -76,10 +76,10 @@ public class UserDao extends AbstractDao implements Serializable {
         }
     }
 
-    public User findUser(String id) {
+    public Mountain findMountain(String id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(User.class, id);
+            return em.find(Mountain.class, id);
         } finally {
             em.close();
         }

@@ -40,5 +40,7 @@ public class Role {
 
     public enum ERole {
         USER,
+        RANGER,
+        SYSADMIN
     }
 }

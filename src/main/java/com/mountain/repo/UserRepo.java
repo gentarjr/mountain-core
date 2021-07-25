@@ -8,17 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepo extends JpaRepository<User, String> {
+    User findByPhoneNumberAndRole(String phoneNumber, ERole role);
 
-    Optional<User> findByPhoneNumberOrEmailOrIdCardAndRole(String phoneNumber, String email, String idCard, ERole roleUser);
+    User findByPhoneNumberOrUsernameOrEmailOrNikAndRole(String phoneNumber, String username, String email, String nik, ERole typeUser);
 
-    User findByPhoneNumberAndRole(String phoneNumber, ERole roleUser);
+    User findByEmailAndRole(String email, ERole typeUser);
 
-    Optional<User> findByEmailAndRole(String email, ERole roleUser);
-
-    Optional<User> findByPhoneNumberAndRoleName(String phoneNumber, String role);
-
-    Optional<User> findByPhoneNumberOrEmailOrIdCardAndRoleName(String phoneNumber, String email, String idCard, String role);
-
-    User findById(String id);
+    User findByPhoneNumber(String phoneNumber);
 }

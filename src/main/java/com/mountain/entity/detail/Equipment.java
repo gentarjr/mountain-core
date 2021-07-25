@@ -1,12 +1,12 @@
 package com.mountain.entity.detail;
 
-import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -17,44 +17,37 @@ public class Equipment implements Serializable {
     @Id
     private String id;
 
+    @Column(name = "back_pack")
     private Integer backPack;
 
+    @Column(name = "water")
     private Integer water;
 
+    @Column(name = "mattress")
     private Integer mattress;
 
+    @Column(name = "tent")
     private Integer tent;
 
+    @Column(name = "food")
     private Integer food;
 
+    @Column(name = "stove")
     private Integer stove;
 
+    @Column(name = "nesting")
     private Integer nesting;
 
+    @Column(name = "rain_coat")
     private Integer rainCoat;
 
+    @Column(name = "flash_light")
     private Integer flashLight;
 
-    private LocalDateTime createdDate;
+    @Column(name = "created_date")
+    private Timestamp createdDate;
 
-    private LocalDateTime updatedDate;
+    @Column(name = "updated_date")
+    private Timestamp updatedDate;
 
-    public Equipment(){
-
-    }
-
-    public Equipment(Integer backPack, Integer water, Integer mattress, Integer tent, Integer food,
-                     Integer stove, Integer nesting, Integer rainCoat, Integer flashLight) {
-        this.id = CodecUtils.generateUUID();
-        this.backPack = backPack;
-        this.water = water;
-        this.mattress = mattress;
-        this.tent = tent;
-        this.food = food;
-        this.stove = stove;
-        this.nesting = nesting;
-        this.rainCoat = rainCoat;
-        this.flashLight = flashLight;
-        this.createdDate = LocalDateTime.now();
-    }
 }

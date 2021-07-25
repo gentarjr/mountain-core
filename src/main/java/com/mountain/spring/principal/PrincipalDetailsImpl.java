@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -19,21 +19,20 @@ public class PrincipalDetailsImpl implements UserDetails {
 
     private String id;
     private String phoneNumber;
-    private String roleName;
     private String mountainName;
     private String email;
     private String firstName;
     @JsonIgnore
     private String pin;
     private ERole role;
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
+    private Timestamp createdDate;
+    private Timestamp updatedDate;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public PrincipalDetailsImpl(String id, String phoneNumber, String email,
-                                String firstName, String pin, ERole role, String roleName, String mountainName,
-                                LocalDateTime createdDate, LocalDateTime updatedDate,
+                                String firstName, String pin, ERole role,
+                                Timestamp createdDate, Timestamp updatedDate,
                                 List<GrantedAuthority> authorities) {
         this.id = id;
         this.phoneNumber = phoneNumber;
@@ -41,8 +40,6 @@ public class PrincipalDetailsImpl implements UserDetails {
         this.firstName = firstName;
         this.pin = pin;
         this.role = role;
-        this.roleName = roleName;
-        this.mountainName = mountainName;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
         this.authorities = authorities;
@@ -55,7 +52,7 @@ public class PrincipalDetailsImpl implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
 
         return new PrincipalDetailsImpl(user.getId(), user.getPhoneNumber(), user.getEmail(), user.getFirstName(), user.getPin(),
-                user.getRole(), user.getRoleName(), user.getMountainName(), user.getCreatedDate(), user.getUpdatedDate(), authorities);
+                user.getRole(), user.getCreatedDate(), user.getUpdatedDate(), authorities);
     }
 
 
@@ -80,8 +77,8 @@ public class PrincipalDetailsImpl implements UserDetails {
         return firstName;
     }
 
-    public String getRoleName() {
-        return roleName;
+    public ERole getRole() {
+        return role;
     }
 
     public String getMountainName() {
@@ -92,15 +89,11 @@ public class PrincipalDetailsImpl implements UserDetails {
         return pin;
     }
 
-    public ERole getRole() {
-        return role;
-    }
-
-    public LocalDateTime getCreatedDate() {
+    public Timestamp getCreatedDate() {
         return createdDate;
     }
 
-    public LocalDateTime getUpdatedDate() {
+    public Timestamp getUpdatedDate() {
         return updatedDate;
     }
 

@@ -42,7 +42,7 @@ public class ApiUserAuthEntryPoint implements AuthenticationEntryPoint {
         String errMessage = authException.getMessage();
         ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), errMessage);
 
-        rm.add(linkTo(methodOn(UserAuthController.class).login(null, null, null, null, null)).withRel("login"));
+        rm.add(linkTo(methodOn(UserAuthController.class).login(null, null, null)).withRel("login"));
 
         mapper.write(response.getWriter(), rm);
     }

@@ -1,16 +1,14 @@
 package com.mountain.entity.user;
 
-import com.mountain.entity.detail.RequestMountain;
 import com.mountain.entity.role.Role;
-import com.mountain.entity.role.RoleMountain;
+import com.mountain.entity.role.Role.ERole;
 import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -23,89 +21,76 @@ public class User implements Serializable {
     @Id
     private String id;
 
-    private String idCard;
+    @Column(name = "mountain_id")
+    private String mountainId;
 
+    @Column(name = "nik")
+    private String nik;
+
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    private String mountainName;
+    @Column(name = "username")
+    private String username;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "address")
     private String address;
 
+    @Column(name = "email")
     private String email;
 
+    @Column(name = "bank_name")
     private String bankName;
 
+    @Column(name = "account_name")
     private String accountName;
 
-    private String accountNumber;
+    @Column(name = "account_number")
+    private Integer accountNumber;
 
-    private Double paymentClimber;
-
+    @Column(name = "pin")
     private String pin;
 
+    @Column(name = "confirmation_pin")
     private String confirmationPin;
 
     @Enumerated(EnumType.STRING)
-    private Role.ERole role;
+    @Column(name = "role")
+    private ERole role;
 
-    private String roleName;
+    @Column(name = "created_date")
+    private Timestamp createdDate;
 
-    private LocalDateTime createdDate;
-
-    private LocalDateTime updatedDate;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user")
-    private List<RequestMountain> requestMountain;
+    @Column(name = "updated_date")
+    private Timestamp updatedDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "id"))
     private Set<Role> roles;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "mountain_role", joinColumns = @JoinColumn(name = "id"))
-    private Set<RoleMountain> roleMountain;
-
-    public User() {
-
+    public User(){
+        this.id = CodecUtils.generateUUID();
     }
 
-    public User(String idCard, String phoneNumber, String firstName, String lastName,
-                String fullAddress, String email, String bankName, String accountName,
-                String accountNumber, String pin, String confirmationPin,
-                Role.ERole roleUser) {
-        this.id = CodecUtils.generateUUID();
-        this.idCard = idCard;
+    public User(String nik, String phoneNumber, String username, String firstName,
+                String lastName, String address, String email, String pin, String confirmationPin, ERole role, Timestamp createdDate) {
+        this();
+        this.nik = nik;
         this.phoneNumber = phoneNumber;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.address = fullAddress;
+        this.address = address;
         this.email = email;
-        this.bankName = bankName;
-        this.accountName = accountName;
-        this.accountNumber = accountNumber;
         this.pin = pin;
         this.confirmationPin = confirmationPin;
-        this.role = roleUser;
-        this.createdDate = LocalDateTime.now();
-    }
-
-    public User(String idCard, String phoneNumber, String firstName, String lastName, String mountainName,
-                String fullAddress, Double paymentClimber, String role, String pin, String confirmationPin) {
-        this.id = CodecUtils.generateUUID();
-        this.idCard = idCard;
-        this.phoneNumber = phoneNumber;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.mountainName = mountainName;
-        this.address = fullAddress;
-        this.paymentClimber = paymentClimber;
-        this.roleName  = role;
-        this.pin = pin;
-        this.confirmationPin = confirmationPin;
+        this.role = role;
+        this.createdDate = createdDate;
     }
 }

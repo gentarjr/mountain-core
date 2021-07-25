@@ -1,14 +1,12 @@
 package com.mountain.entity.detail;
 
-import com.mountain.entity.user.User;
 import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
@@ -19,47 +17,31 @@ public class RequestMountain implements Serializable {
     @Id
     private String id;
 
+    @Column(name = "users_id")
+    private String usersId;
+
+    @Column(name = "transaction_id")
+    private String transactionId;
+
+    @Column(name = "equipment_id")
+    private String equipmentId;
+
+    @Column(name = "total_climber")
     private Integer totalClimber;
 
+    @Column(name = "request_mountain")
     private String requestMountain;
 
-    private String status;
+    @Column(name = "status")
+    private Boolean status;
 
+    @Column(name = "reason")
     private String reason;
 
-    private String deviceId;
+    @Column(name = "created_date")
+    private Timestamp createdDate;
 
-    private LocalDateTime createdDate;
+    @Column(name = "updated_date")
+    private Timestamp updatedDate;
 
-    private LocalDateTime updatedDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "requestMountain")
-    private List<Member> member;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "equipment_id")
-    private Equipment equipment;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "transaction_id")
-    private Transaction transaction;
-
-    public RequestMountain(){
-
-    }
-
-    public RequestMountain(Integer totalClimber, String requestMountain, String status, String reason, String deviceId) {
-        this.id = CodecUtils.generateUUID();
-        this.totalClimber = totalClimber;
-        this.requestMountain = requestMountain;
-        this.status = status;
-        this.reason = reason;
-        this.deviceId = deviceId;
-        this.createdDate = LocalDateTime.now();
-    }
 }

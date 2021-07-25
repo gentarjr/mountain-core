@@ -184,6 +184,6 @@ public class ValidationUtils {
     }
 
     public static void validateTipeUser(String val)throws InvalidFieldException{
-        validateValue(val, "Tipe user tidak valid", "USER", "MERCHANT", "SYSADMIN");
+        validateValue(val, "Tipe user tidak valid", "USER", "RANGER", "SYSADMIN");
     }
 }

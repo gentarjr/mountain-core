@@ -1,15 +1,18 @@
 package com.mountain.entity.detail;
 
-import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(name = "transaction")
 public class Transaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -17,31 +20,24 @@ public class Transaction implements Serializable {
     @Id
     private String id;
 
+    @Column(name = "mountain")
     private String mountain;
 
+    @Column(name = "payment")
     private Double payment;
 
-    private String climberDate;
+    @Column(name = "climber_date")
+    private Timestamp climberDate;
 
+    @Column(name = "status")
     private String status;
 
+    @Column(name = "reason")
     private String reason;
 
-    private LocalDateTime createdDate;
+    @Column(name = "created_date")
+    private Timestamp createdDate;
 
+    @Column(name = "updated_date")
     private LocalDateTime updatedDate;
-
-    public Transaction(){
-
-    }
-
-    public Transaction(String mountain, Double payment, String stats, String reas, String date) {
-        this.id = CodecUtils.generateUUID();
-        this.mountain = mountain;
-        this.payment = payment;
-        this.status = stats;
-        this.reason = reas;
-        this.climberDate = date;
-        this.createdDate = LocalDateTime.now();
-    }
 }

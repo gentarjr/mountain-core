@@ -1,81 +1,45 @@
 package com.mountain.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mountain.entity.role.Role;
+import com.mountain.entity.role.Role.ERole;
 import com.mountain.library.helper.DateUtils;
 import lombok.Data;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.sql.Timestamp;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-public class UserResponse implements Serializable {
+public class UserResponse {
 
     private static final long serialVersionUID = 1L;
 
     private String id;
-    private String idCard;
+    private String nik;
+    private String username;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String mountainName;
-    private String email;
-    private String status;
-    private String reason;
     private String address;
-    private Integer totalClimber;
-    private Double paymentClimber;
-    private List<RequestMountainResponse> requestMountain;
-    private Role.ERole role;
-    private String roleName;
-    private String bankName;
-    private String accountName;
-    private String accountNumber;
-    private String accessToken;
-
+    private String email;
+    private ERole role;
+    private String token;
     private String createdDate;
-    private String updatedDate;
+    private Timestamp updatedDate;
 
-    public UserResponse(){
 
-    }
+    public UserResponse(String id, String nik, String username, String firstName, String lastName,
+                        String phoneNumber, String address, String email, ERole role, String token, Timestamp createdDate, Timestamp updatedDate) {
 
-    public UserResponse(String token, String id, String idCard, String firstName,
-                        String lastName, String phoneNumber, String email, String address, Role.ERole role,
-                        String bankName, String accountName, String accountNumber, List<RequestMountainResponse> requestMountain,
-                         LocalDateTime createdDate, LocalDateTime updatedDate) {
-        this.accessToken = token;
         this.id = id;
-        this.idCard = idCard;
+        this.nik = nik;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.email = email;
         this.address = address;
+        this.email = email;
         this.role = role;
-        this.bankName = bankName;
-        this.accountName = accountName;
-        this.accountNumber = accountNumber;
-        this.requestMountain = requestMountain;
-        this.createdDate = DateUtils.formatDateTimeOrEmptyString(createdDate);
-        this.updatedDate = DateUtils.formatDateTimeOrEmptyString(updatedDate, "dd/MMM/yyyy kk:mm");
-    }
-
-    public UserResponse(String token, String id, String idCard, String firstName, String lastName, String mountainName, String phoneNumber,
-                        String email, String address, String roleName, LocalDateTime createdDate, LocalDateTime updatedDate) {
-        this.accessToken = token;
-        this.id = id;
-        this.idCard = idCard;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.mountainName = mountainName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.address = address;
-        this.roleName = roleName;
-        this.createdDate = DateUtils.formatDateTimeOrEmptyString(createdDate);
-        this.updatedDate = DateUtils.formatDateTimeOrEmptyString(updatedDate, "dd/MMM/yyyy kk:mm");
+        this.token = token;
+        this.createdDate = DateUtils.formatDateTimeOrEmptyString(createdDate.toLocalDateTime());
+        this.updatedDate = updatedDate;
     }
 }

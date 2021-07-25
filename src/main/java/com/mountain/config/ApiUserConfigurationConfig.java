@@ -1,6 +1,5 @@
 package com.mountain.config;
 
-import com.mountain.spring.principal.PrincipalServiceImpl;
 import com.mountain.spring.security.ApiAccessDeniedHandler;
 import com.mountain.spring.security.ApiUserAuthEntryPoint;
 import com.mountain.spring.security.ApiUserAuthenticationFilter;
@@ -24,7 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
 
-    private final PrincipalServiceImpl principalServiceImpl;
     private final ApiUserAuthEntryPoint apiAuthEntryPoint;
     private final ApiAccessDeniedHandler apiAccessDeniedHandler;
 
@@ -33,12 +31,6 @@ public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
         return new ApiUserAuthenticationFilter();
     }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(principalServiceImpl).passwordEncoder(passwordEncoder());
-    }
-
-    @Bean(name = "userAuthManager")
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();

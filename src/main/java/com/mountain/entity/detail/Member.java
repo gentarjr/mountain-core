@@ -1,11 +1,10 @@
 package com.mountain.entity.detail;
 
-import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -16,44 +15,40 @@ public class Member implements Serializable {
     @Id
     private String id;
 
-    private String idCard;
+    @Column(name = "request_id")
+    private String requestId;
 
+    @Column(name = "nik")
+    private String nik;
+
+    @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "name")
     private String name;
 
-    private String provinsi;
+    @Column(name = "province")
+    private String province;
 
-    private String chairman;
+    @Column(name = "head")
+    private Boolean head;
 
-    private String kota;
+    @Column(name = "city")
+    private String city;
 
-    private String kecamatan;
+    @Column(name = "sub_district")
+    private String subDistrict;
 
-    private String rtRw;
+    @Column(name = "village")
+    private String village;
 
-    private LocalDateTime createdDate;
+    @Column(name = "full_address")
+    private String fullAddress;
 
-    private LocalDateTime updatedDate;
+    @Column(name = "created_date")
+    private Timestamp createdDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id")
-    private RequestMountain requestMountain;
+    @Column(name = " updated_date")
+    private Timestamp updatedDate;
 
-    public Member(){
-
-    }
-
-    public Member(String idCard, String name, String phoneNumber,
-                  String provinsi, String kota, String kecamatan, String rtrw) {
-        this.id = CodecUtils.generateUUID();
-        this.idCard = idCard;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.provinsi = provinsi;
-        this.kota = kota;
-        this.kecamatan = kecamatan;
-        this.rtRw = rtrw;
-        this.createdDate = LocalDateTime.now();
-    }
 }

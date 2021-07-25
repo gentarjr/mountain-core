@@ -17,8 +17,6 @@ import com.mountain.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,40 +35,40 @@ import java.util.Set;
 @Slf4j
 public class UserRegistrationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserRegistrationController.class);
-
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
 
     @PostMapping("/register/pre-check")
-    public HttpEntity<ResponseEnvelope> preRegisterCheck(@RequestBody UserForm form) {
+    public HttpEntity<ResponseEnvelope> preRegisterCheck(@RequestBody UserForm form){
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
-
-        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Sukses");
-        try {
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
+        try{
 
             String phoneNumber = form.getPhoneNumber();
+            String username = form.getUsername();
             String email = form.getEmail();
-            String idCard = form.getIdCard();
+            String nik = form.getNik();
             String role = form.getRole();
 
             ValidationUtils.rejectIfEmptyField(" Cannot be empty",
-                    new String[][]{{"Phone Number", phoneNumber}, {"Email", email}, {"Role user", role}});
+                    new String[][]{{"Phone Number", phoneNumber}, {"NIK", nik}, {"Email", email}, {"Role user", role}});
 
             ValidationUtils.validateTipeUser(role);
-            ERole roleUser = ERole.valueOf(role.toUpperCase());
+            ERole typeUser = ERole.valueOf(role.toUpperCase());
 
             ValidationUtils.validateEmail(email);
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
 
-            userRepo.findByPhoneNumberOrEmailOrIdCardAndRole(phoneNumber, email, idCard, roleUser).ifPresent(p -> {
-                throw new PreexistingUserException(ErrCode.NOT_ACCEPTABLE, "Phone number or email or idCard already registered");
-            });
+            User u = userRepo.findByPhoneNumberOrUsernameOrEmailOrNikAndRole(phoneNumber, username, email, nik, typeUser);
 
-            log.info("Phone number {}, email {}, type {} can not be registered", phoneNumber, email, roleUser);
-        } catch (WinterfellException e) {
+            if(u != null){
+                throw new PreexistingUserException(ErrCode.IM_USED, "Phone number or email or idCard already registered");
+            }
+
+            log.info("Phone number {}, email {}, role {} can not be registered", phoneNumber, email, typeUser);
+        }catch (WinterfellException e) {
             status = HttpStatus.CONFLICT;
             rm.setCode(e.getErrCode().getCode());
             rm.setMessage(e.getMessage());
@@ -87,47 +86,40 @@ public class UserRegistrationController {
     }
 
     @PostMapping("/register")
-    public HttpEntity<ResponseEnvelope> registerUser(@RequestBody UserForm form) {
+    public HttpEntity<ResponseEnvelope> registerUser(@RequestBody UserForm form){
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
-        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Sukses");
-        try {
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
 
-            String idCard = form.getIdCard();
+        try{
+            String nik = form.getNik();
+            String phoneNumber = form.getPhoneNumber();
+            String username = form.getUsername();
             String firstName = form.getFirstName();
             String lastName = form.getLastName();
+            String address = form.getAddress();
             String email = form.getEmail();
-            String phoneNumber = form.getPhoneNumber();
-            String fullAddress = form.getFullAddress();
             String pin = form.getPin();
             String confirmationPin = form.getConfirmationPin();
-            String bankName = form.getBankName();
-            String accountName = form.getAccountName();
-            String accountNumber = form.getAccountNumber();
             String role = form.getRole();
 
-
-            // field cannot be empty
             ValidationUtils.rejectIfEmptyField(" cannot be empty",
-                    new String[][]{{"ID Card", idCard}, {"First Name", firstName}, {"Last Name", lastName}, {"Email", email},
-                            {"Phone Number", phoneNumber}, {"Full Address", fullAddress}, {"Pin", pin},
-                            {"Confirmation Pin", confirmationPin}, {"Bank Name", bankName}, {"Account Name", accountName},
-                            {"Account Number", accountNumber}, {"role", role}});
+                    new String[][]{{"ID Card", nik}, {"Phone Number", phoneNumber}, {"Username", username}, {"First Name", firstName},
+                            {"Last Name", lastName}, {"Email", email}, {"Full Address", address}, {"Pin", pin},
+                            {"Confirmation Pin", confirmationPin}, {"role", role}});
 
-            //field cannot be with whitespace
-            ValidationUtils.rejectIfWhitespaceField(" cannot be empty",
+            ValidationUtils.rejectIfWhitespaceField(" cannot be white space",
                     new String[][]{{"Email", email}, {"Phone Number", phoneNumber}, {"Pin", pin}, {"Confirmation Pin", confirmationPin},
-                            {"Account Number", accountNumber}, {"role", role}});
+                            {"Username", username}, {"role", role}});
 
             ValidationUtils.validateTipeUser(role);
-            ERole roleUser = ERole.valueOf(role.toUpperCase());
+            ERole typeUser = ERole.valueOf(role.toUpperCase());
 
-            String namaFieldName = roleUser == ERole.USER ? "User Name" : "Nama";
+            String fieldName = typeUser == ERole.USER ? "User Name" : "Name";
 
-            //just number and letters
             ValidationUtils.rejectIfNotAlphanumeric(" Just number and letters",
-                    new String[][]{{namaFieldName, firstName},{namaFieldName, lastName}});
+                    new String[][]{{fieldName, firstName},{fieldName, lastName}});
 
             ValidationUtils.validateEmail(email);
             ValidationUtils.validateNumber(phoneNumber, "Phone number format invalid");
@@ -136,31 +128,41 @@ public class UserRegistrationController {
                 throw new InvalidFieldException(ErrCode.NOT_ACCEPTABLE, "Combination pin invalid");
             }
 
-            User u = userRepo.findByPhoneNumberAndRole(phoneNumber, roleUser);
+            User u = userRepo.findByPhoneNumberAndRole(phoneNumber, typeUser);
+
             if(u != null){
-                throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Phone number already registered");
+                throw new InvalidFieldException(ErrCode.IM_USED, "User already registered");
+            }
+
+            User phone = userRepo.findByPhoneNumber(phoneNumber);
+
+            if(phone != null){
+                throw new InvalidFieldException(ErrCode.IM_USED, "Phone number already registered");
             }
 
             if (StringUtils.isNotEmpty(email)) {
-                userRepo.findByEmailAndRole(email, roleUser).ifPresent(p -> {
-                    throw new PreexistingUserException(ErrCode.MULTIPLE_CHOICE, "Email already registered");
-                });
+                User emailCheck = userRepo.findByEmailAndRole(email, typeUser);
+                if(emailCheck != null){
+                    throw new PreexistingUserException(ErrCode.IM_USED, "Email already registered");
+                }
             }
 
             Set<Role> roles = new HashSet<>();
-            Role r = roleRepo.findByName(ERole.USER);
+            Role r = roleRepo.findByName(typeUser);
             roles.add(r);
 
             String encryptPassword = CodecUtils.encodeBcrypt(pin);
 
-            User user = new User(idCard, phoneNumber, firstName, lastName, fullAddress, email, bankName,
-                    accountName, accountNumber, encryptPassword, encryptPassword, roleUser);
+            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+
+            User user = new User(nik, phoneNumber, username, firstName, lastName,
+                    address, email, encryptPassword, encryptPassword, typeUser, createdDate);
 
             user.setRoles(roles);
             userRepo.save(user);
 
             log.info("registered user success {}", user);
-        } catch (WinterfellException e) {
+        }catch (WinterfellException e) {
             status = HttpStatus.CONFLICT;
             rm.setCode(e.getErrCode().getCode());
             rm.setMessage(e.getMessage());
