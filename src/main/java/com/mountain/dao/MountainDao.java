@@ -3,16 +3,26 @@ package com.mountain.dao;
 import com.mountain.entity.detail.Mountain;
 import com.mountain.library.exceptions.NonexistentEntityException;
 import com.mountain.library.exceptions.PreexistingEntityException;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.file.Paths;
 
 @Service
 public class MountainDao extends AbstractDao implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LoggerFactory.getLogger(MountainDao.class);
 
     public void create(Mountain mountain) throws Exception {
         EntityManager em = null;
@@ -83,5 +93,19 @@ public class MountainDao extends AbstractDao implements Serializable {
         } finally {
             em.close();
         }
+    }
+
+    public void saveDocMountain(String folder, Mountain mountain, MultipartFile photoFile) throws IOException {
+        String newPhoto = photoFile.getOriginalFilename();
+
+        File savedFile = Paths.get(folder, newPhoto).toFile();
+
+        InputStream inputPhoto = photoFile.getInputStream();
+
+        FileUtils.copyInputStreamToFile(inputPhoto, savedFile);
+        String Photo = FileUtils.byteCountToDisplaySize(photoFile.getSize());
+
+        logger.info("Uploaded {} saved to {} {} {}", mountain.getPhoto(),
+                savedFile.getName(), Photo, savedFile.getAbsolutePath());
     }
 }

@@ -4,6 +4,11 @@ public interface AppConstant {
 
     String APP_NAME = "MountainAPP";
 
+    String BASE_FOLDER_PATH = "../mountain-core/data";
+    String FOLDER_MOUNTAIN_PATH = "/storage/mountain";
+    String FOLDER_STATUS_PATH = "/storage/mountain";
+
+
     String ROUNDING_MODE_HALF_UP = "HALF_UP";
     String ROUNDING_MODE_HALF_DOWN = "HALF_DOWN";
     String ROUNDING_MODE_HALF_EVEN = "HALF_EVEN";

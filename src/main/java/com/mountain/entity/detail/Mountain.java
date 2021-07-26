@@ -18,6 +18,9 @@ public class Mountain implements Serializable {
     @Id
     private String id;
 
+    @Column(name = "photo")
+    private String photo;
+
     @Column(name = "mountain_name")
     private String mountainName;
 

@@ -22,4 +22,7 @@ public class UserForm {
     private String pin;
     private String confirmationPin;
     private String role;
+
+    private String status;
+    private String mountainId;
 }

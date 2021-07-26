@@ -136,8 +136,14 @@ public class UserRegistrationController {
 
             User phone = userRepo.findByPhoneNumber(phoneNumber);
 
-            if(phone != null){
+            if(phone.getPhoneNumber().equals(phoneNumber)){
                 throw new InvalidFieldException(ErrCode.IM_USED, "Phone number already registered");
+            }
+
+            User usern = userRepo.findByUsername(username);
+
+            if(usern.getUsername().equals(username)){
+                throw new InvalidFieldException(ErrCode.IM_USED, "Username number already registered");
             }
 
             if (StringUtils.isNotEmpty(email)) {

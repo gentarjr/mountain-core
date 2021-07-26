@@ -2,6 +2,7 @@ create table mountain
 (
     id            varchar(255) not null,
     mountain_name varchar(30)  not null,
+    photo         varchar(50),
     basecamp_name varchar(30)  not null,
     description   varchar(255) not null,
     height        int          not null,
@@ -22,6 +23,7 @@ CREATE table USERS
     nik              varchar(16)        not null,
     phone_number     varchar(12) unique not null,
     username         varchar(20) unique not null,
+    photo            varchar(50),
     first_name       varchar(30)        not null,
     last_name        varchar(30)        not null,
     address          varchar(255)       not null,
@@ -36,6 +38,35 @@ CREATE table USERS
     updated_date     timestamp,
     primary key (id),
     FOREIGN key (mountain_id) REFERENCES mountain (id)
+);
+
+CREATE table status
+(
+    id           varchar(255) not null,
+    users_id     varchar(255) not null,
+    mountain_id  varchar(255),
+    username     varchar(30)  not null,
+    role         varchar(20)  not null,
+    status       varchar(300) not null,
+    photo        varchar(50),
+    created_date timestamp,
+    updated_date timestamp,
+    primary key (id),
+    foreign key (users_id) references USERS (id),
+    foreign key (mountain_id) references mountain (id)
+);
+
+create table reply_status
+(
+    id           varchar(255) not null,
+    status_id    varchar(300) not null,
+    username     varchar(30)  not null,
+    role         varchar(20)  not null,
+    reply        varchar(300) not null,
+    created_date timestamp,
+    updated_date timestamp,
+    primary key (id),
+    foreign key (status_id) references status (id)
 );
 
 CREATE table transaction
@@ -113,6 +144,9 @@ create table member
     FOREIGN KEY (request_id) references request_mountain (id)
 );
 
-insert into roles(name) values('USER');
-insert into roles(name) values('RANGER');
-insert into roles(name) values('SYSADMIN');
+insert into roles(name)
+values ('USER');
+insert into roles(name)
+values ('RANGER');
+insert into roles(name)
+values ('SYSADMIN');

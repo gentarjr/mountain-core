@@ -40,9 +40,10 @@ public class JwtService {
 
         JwtBuilder jwtBuilder = Jwts.builder()
                 .claim("role", roles)
-                .setSubject((u.getPhoneNumber()))
-                .setSubject((u.getUsername()))
-                .setSubject((u.getEmail()))
+                .claim("phoneNumber", u.getPhoneNumber())
+                .claim("username", u.getUsername())
+                .claim("email", u.getEmail())
+                .setSubject(u.getPhoneNumber())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret);

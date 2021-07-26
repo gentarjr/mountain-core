@@ -6,9 +6,7 @@ import com.mountain.spring.security.ApiUserAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@Order(1)
 @RequiredArgsConstructor
 public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
 
@@ -44,7 +41,7 @@ public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.requestMatchers()
-                .antMatchers("/*/users/**", "/*/users/**")
+                .antMatchers("/*/users/**", "/*/mountain/**")
                 .and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(apiAuthEntryPoint)
                 .accessDeniedHandler(apiAccessDeniedHandler).and()
@@ -53,10 +50,7 @@ public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/users/auth/**").permitAll()
                 .antMatchers("/v1/mountain/auth/**").permitAll()
                 .antMatchers("/v1/users/*/logout").permitAll()
-                .antMatchers("/v1/mountain/*/logout").permitAll()
                 .antMatchers("/v1/users/register/**").permitAll()
-                .antMatchers("/v1/mountain/register/**").permitAll()
-                .antMatchers("/v1/users/**").hasAnyAuthority("USER")
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationUserFilter(), UsernamePasswordAuthenticationFilter.class);

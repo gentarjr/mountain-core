@@ -1,5 +1,6 @@
 package com.mountain.spring.security;
 
+import com.mountain.spring.principal.PrincipalServiceImpl;
 import com.mountain.spring.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -27,6 +28,9 @@ public class ApiUserAuthenticationFilter extends OncePerRequestFilter {
     @Value("${mountain.app.jwtSecret}")
     private String jwtSecret;
 
+    @Autowired
+    private PrincipalServiceImpl principalServiceImpl;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -36,11 +40,15 @@ public class ApiUserAuthenticationFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             if (jwt != null && jwtService.validateJwtToken(jwt)) {
                 String username = jwtService.getUserNameFromJwtToken(jwt);
-
-                Jws<Claims> parseJwt = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt);
-                String tipeUser = (String) parseJwt.getBody().get("role");
                 UserDetails user;
 
+                user = principalServiceImpl.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        user, null, user.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);

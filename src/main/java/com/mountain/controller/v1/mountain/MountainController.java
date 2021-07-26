@@ -1,11 +1,13 @@
 package com.mountain.controller.v1.mountain;
 
+import com.mountain.dao.MountainDao;
 import com.mountain.dao.UserDao;
 import com.mountain.domain.form.MountainForm;
 import com.mountain.domain.form.UserForm;
 import com.mountain.entity.detail.Mountain;
 import com.mountain.entity.role.Role;
 import com.mountain.entity.user.User;
+import com.mountain.library.domain.AppConstant;
 import com.mountain.library.domain.ErrCode;
 import com.mountain.library.domain.ResponseEnvelope;
 import com.mountain.library.exceptions.InvalidFieldException;
@@ -21,13 +23,19 @@ import com.mountain.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,13 +46,16 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MountainController {
 
+    private final Logger logger = LoggerFactory.getLogger(MountainController.class);
+
     private final UserDao userDao;
     private final MountainRepo mountainRepo;
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
+    private final MountainDao mountainDao;
 
     @PostMapping("/input-mountain/{id}")
-    public HttpEntity<ResponseEnvelope> inputMountain(@RequestBody MountainForm form , @PathVariable String id){
+    public HttpEntity<ResponseEnvelope> inputMountain(MountainForm form , @PathVariable String id, @RequestParam("photo")MultipartFile photo){
 
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
@@ -63,6 +74,8 @@ public class MountainController {
             String regulation = form.getRegulation();
             String fullAddress = form.getFullAddress();
             Double price = form.getPrice();
+
+            String photoNew = photo.getOriginalFilename();
 
             if(u == null){
                 throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
@@ -93,7 +106,20 @@ public class MountainController {
                 throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain and Basecamp already registered");
             }
 
+
+
             Mountain mountain = new Mountain(mountainName, basecampName, description, height, regulation, fullAddress, price, createdDate, u.getUsername());
+
+            if(!photoNew.equals("")){
+                mountain.setPhoto(photoNew);
+                Path folderMountainPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH, mountain.getId());
+                File folderMountain = folderMountainPath.toFile();
+                if (!folderMountain.exists() || !folderMountain.isDirectory()) {
+                    folderMountain.mkdir();
+                    logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
+                }
+                mountainDao.saveDocMountain(folderMountainPath.toString(), mountain, photo);
+            }
             mountainRepo.save(mountain);
 
             u.setMountainId(mountain.getId());
