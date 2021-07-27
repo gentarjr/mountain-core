@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,7 +27,7 @@ public class Transaction implements Serializable {
     private Double payment;
 
     @Column(name = "climber_date")
-    private Timestamp climberDate;
+    private LocalDate climberDate;
 
     @Column(name = "status")
     private String status;
@@ -36,7 +36,7 @@ public class Transaction implements Serializable {
     private String reason;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;

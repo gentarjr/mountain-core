@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -24,32 +24,23 @@ public class Mountain implements Serializable {
     @Column(name = "mountain_name")
     private String mountainName;
 
-    @Column(name = "basecamp_name")
-    private String basecampName;
-
     @Column(name = "description")
     private String description;
 
     @Column(name = "height")
     private Integer height;
 
-    @Column(name = "regulation")
-    private String regulation;
-
     @Column(name = "fullAddress")
     private String fullAddress;
 
-    @Column(name = "price")
-    private Double price;
-
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "created_by")
     private String createdBy;
 
     @Column(name = "updated_date")
-    private Timestamp updatedDate;
+    private LocalDateTime updatedDate;
 
     @Column(name = "updated_by")
     private String updatedBy;
@@ -58,17 +49,14 @@ public class Mountain implements Serializable {
         this.id = CodecUtils.generateUUID();
     }
 
-    public Mountain(String mountainName, String basecampName, String description, Integer height,
-                    String regulation, String fullAddress, Double price, Timestamp createdDate, String createdBy) {
+    public Mountain(String mountainName, String description, Integer height,
+                    String fullAddress, String createdBy) {
         this();
         this.mountainName = mountainName;
-        this.basecampName = basecampName;
         this.description = description;
         this.height = height;
-        this.regulation = regulation;
         this.fullAddress = fullAddress;
-        this.price = price;
-        this.createdDate = createdDate;
+        this.createdDate = LocalDateTime.now();
         this.createdBy = createdBy;
     }
 }

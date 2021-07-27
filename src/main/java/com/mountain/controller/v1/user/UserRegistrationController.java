@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -159,10 +158,8 @@ public class UserRegistrationController {
 
             String encryptPassword = CodecUtils.encodeBcrypt(pin);
 
-            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-
             User user = new User(nik, phoneNumber, username, firstName, lastName,
-                    address, email, encryptPassword, encryptPassword, typeUser, createdDate);
+                    address, email, encryptPassword, encryptPassword, typeUser);
 
             user.setRoles(roles);
             userRepo.save(user);

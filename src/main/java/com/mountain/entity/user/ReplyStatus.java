@@ -1,9 +1,10 @@
 package com.mountain.entity.user;
 
+import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -25,8 +26,18 @@ public class ReplyStatus {
     private String reply;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
-    @Column(name = "updated_date")
-    private Timestamp updatedDate;
+    public ReplyStatus(){
+        this.id = CodecUtils.generateUUID();
+    }
+
+    public ReplyStatus(String statusId, String username, String role, String replyStatus) {
+        this();
+        this.statusId = statusId;
+        this.username = username;
+        this.role = role;
+        this.reply = replyStatus;
+        this.createdDate = LocalDateTime.now();
+    }
 }

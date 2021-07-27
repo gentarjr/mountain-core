@@ -4,10 +4,10 @@ import com.mountain.entity.role.Role;
 import com.mountain.entity.role.Role.ERole;
 import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -64,11 +64,15 @@ public class User implements Serializable {
     @Column(name = "role")
     private ERole role;
 
+    @Column(name = "is_deleted")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private Boolean isDeleted;
+
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
-    private Timestamp updatedDate;
+    private LocalDateTime updatedDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "id"))
@@ -78,8 +82,9 @@ public class User implements Serializable {
         this.id = CodecUtils.generateUUID();
     }
 
+    //user
     public User(String nik, String phoneNumber, String username, String firstName,
-                String lastName, String address, String email, String pin, String confirmationPin, ERole role, Timestamp createdDate) {
+                String lastName, String address, String email, String pin, String confirmationPin, ERole role) {
         this();
         this.nik = nik;
         this.phoneNumber = phoneNumber;
@@ -91,6 +96,24 @@ public class User implements Serializable {
         this.pin = pin;
         this.confirmationPin = confirmationPin;
         this.role = role;
-        this.createdDate = createdDate;
+        this.createdDate = LocalDateTime.now();
+    }
+
+    //ranger
+    public User(String nik, String phoneNumber, String username, String firstName,
+                String lastName, String address, String email, String pin, String confirmationPin, ERole role, Boolean isDeleted) {
+        this();
+        this.nik = nik;
+        this.phoneNumber = phoneNumber;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.email = email;
+        this.pin = pin;
+        this.confirmationPin = confirmationPin;
+        this.role = role;
+        this.createdDate = LocalDateTime.now();
+        this.isDeleted = isDeleted;
     }
 }

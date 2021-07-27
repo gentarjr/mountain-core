@@ -24,5 +24,7 @@ public class UserForm {
     private String role;
 
     private String status;
+    private String replyStatus;
+    private String statusId;
     private String mountainId;
 }

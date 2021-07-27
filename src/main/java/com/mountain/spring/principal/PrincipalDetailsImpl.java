@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -25,14 +25,14 @@ public class PrincipalDetailsImpl implements UserDetails {
     @JsonIgnore
     private String pin;
     private ERole role;
-    private Timestamp createdDate;
-    private Timestamp updatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public PrincipalDetailsImpl(String id, String phoneNumber, String email,
                                 String firstName, String pin, ERole role,
-                                Timestamp createdDate, Timestamp updatedDate,
+                                LocalDateTime createdDate, LocalDateTime updatedDate,
                                 List<GrantedAuthority> authorities) {
         this.id = id;
         this.phoneNumber = phoneNumber;
@@ -89,11 +89,11 @@ public class PrincipalDetailsImpl implements UserDetails {
         return pin;
     }
 
-    public Timestamp getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public Timestamp getUpdatedDate() {
+    public LocalDateTime getUpdatedDate() {
         return updatedDate;
     }
 

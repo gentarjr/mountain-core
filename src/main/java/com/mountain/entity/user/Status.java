@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -32,20 +33,17 @@ public class Status {
     private String photo;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
-
-    @Column(name = "updated_date")
-    private Timestamp updatedDate;
+    private LocalDateTime createdDate;
 
     public Status(){
         this.id = CodecUtils.generateUUID();
     }
 
-    public Status(String username, String role, String status, Timestamp createdDate) {
+    public Status(String username, String role, String status) {
         this();
         this.username = username;
         this.role = role;
         this.status = status;
-        this.createdDate = createdDate;
+        this.createdDate = LocalDateTime.now();
     }
 }

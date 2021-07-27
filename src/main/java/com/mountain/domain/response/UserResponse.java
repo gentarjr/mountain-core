@@ -5,10 +5,12 @@ import com.mountain.entity.role.Role.ERole;
 import com.mountain.library.helper.DateUtils;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
-public class UserResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UserResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,11 +25,11 @@ public class UserResponse {
     private ERole role;
     private String token;
     private String createdDate;
-    private Timestamp updatedDate;
+    private String updatedDate;
 
 
     public UserResponse(String id, String nik, String username, String firstName, String lastName,
-                        String phoneNumber, String address, String email, ERole role, String token, Timestamp createdDate, Timestamp updatedDate) {
+                        String phoneNumber, String address, String email, ERole role, String token, LocalDateTime createdDate, LocalDateTime updatedDate) {
 
         this.id = id;
         this.nik = nik;
@@ -39,7 +41,7 @@ public class UserResponse {
         this.email = email;
         this.role = role;
         this.token = token;
-        this.createdDate = DateUtils.formatDateTimeOrEmptyString(createdDate.toLocalDateTime());
-        this.updatedDate = updatedDate;
+        this.createdDate = DateUtils.formatDateTimeOrEmptyString(createdDate);
+        this.updatedDate = DateUtils.formatDateTimeOrEmptyString(updatedDate, "dd/MMM/yyyy kk:mm");
     }
 }

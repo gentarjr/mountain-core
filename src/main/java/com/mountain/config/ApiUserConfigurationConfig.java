@@ -51,6 +51,7 @@ public class ApiUserConfigurationConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/mountain/auth/**").permitAll()
                 .antMatchers("/v1/users/*/logout").permitAll()
                 .antMatchers("/v1/users/register/**").permitAll()
+                .antMatchers("/v1/mountain/img").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationUserFilter(), UsernamePasswordAuthenticationFilter.class);

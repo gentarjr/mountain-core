@@ -3,17 +3,34 @@ create table mountain
     id            varchar(255) not null,
     mountain_name varchar(30)  not null,
     photo         varchar(50),
-    basecamp_name varchar(30)  not null,
     description   varchar(255) not null,
     height        int          not null,
-    regulation    varchar(255) not null,
     full_address  varchar(255) not null,
-    price         int          not null,
     created_date  TIMESTAMP,
     created_by    varchar(30),
     updated_date  TIMESTAMP,
     updated_by    varchar(30),
     primary key (id)
+);
+
+create table basecamp
+(
+    id              varchar(255) not null,
+    mountain_id     varchar(255) not null,
+    basecamp_name   varchar(255) not null,
+    description     varchar(255) not null,
+    photo           varchar(255) not null,
+    regulation      varchar(255) not null,
+    full_address    varchar(255) not null,
+    price           int          not null,
+    total_climber   int,
+    request_climber TIMESTAMP,
+    created_date    TIMESTAMP,
+    created_by      varchar(30),
+    updated_date    TIMESTAMP,
+    updated_by      varchar(30),
+    primary key (id),
+    foreign key (mountain_id) references mountain (id)
 );
 
 CREATE table USERS
@@ -34,6 +51,7 @@ CREATE table USERS
     pin              varchar(255)       not null,
     confirmation_pin varchar(255)       not null,
     role             varchar(20)        not null,
+    is_deleted       int,
     created_date     timestamp,
     updated_date     timestamp,
     primary key (id),
@@ -50,7 +68,6 @@ CREATE table status
     status       varchar(300) not null,
     photo        varchar(50),
     created_date timestamp,
-    updated_date timestamp,
     primary key (id),
     foreign key (users_id) references USERS (id),
     foreign key (mountain_id) references mountain (id)
@@ -64,7 +81,6 @@ create table reply_status
     role         varchar(20)  not null,
     reply        varchar(300) not null,
     created_date timestamp,
-    updated_date timestamp,
     primary key (id),
     foreign key (status_id) references status (id)
 );
@@ -109,7 +125,7 @@ create table request_mountain
 (
     id               varchar(255) not null,
     users_id         varchar(255) not null,
-    mountain_id      varchar(255) not null,
+    basecamp_id      varchar(255) not null,
     transaction_id   varchar(255) not null,
     equipment_id     varchar(255) not null,
     total_climber    int          not null,
@@ -120,7 +136,7 @@ create table request_mountain
     updated_date     TIMESTAMP,
     primary key (id),
     FOREIGN key (users_id) REFERENCES users (id),
-    FOREIGN key (mountain_id) REFERENCES mountain (id),
+    FOREIGN key (basecamp_id) REFERENCES basecamp (id),
     FOREIGN key (transaction_id) REFERENCES transaction (id),
     FOREIGN key (equipment_id) REFERENCES equipment (id)
 );

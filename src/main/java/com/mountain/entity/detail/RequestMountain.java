@@ -1,11 +1,9 @@
 package com.mountain.entity.detail;
 
-import com.mountain.library.helper.CodecUtils;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -39,9 +37,9 @@ public class RequestMountain implements Serializable {
     private String reason;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
-    private Timestamp updatedDate;
+    private LocalDateTime updatedDate;
 
 }

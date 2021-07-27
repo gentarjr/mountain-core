@@ -4,7 +4,7 @@ import com.mountain.controller.v1.mountain.MountainController;
 import com.mountain.dao.StatusDao;
 import com.mountain.dao.UserDao;
 import com.mountain.domain.form.UserForm;
-import com.mountain.entity.detail.Mountain;
+import com.mountain.entity.user.ReplyStatus;
 import com.mountain.entity.user.Status;
 import com.mountain.entity.user.User;
 import com.mountain.library.domain.AppConstant;
@@ -33,7 +33,6 @@ import javax.persistence.EntityTransaction;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
 
 @RestController
 @RequestMapping(value = "/v1/users")
@@ -75,14 +74,12 @@ public class UserController {
                 throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
-            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-
             String role = u.getRole().toString();
 
             Path folderStatusPath;
 
 
-            Status s = new Status(u.getUsername(), role, statusUser, createdDate);
+            Status s = new Status(u.getUsername(), role, statusUser);
             s.setUsersId(id);
             s.setMountainId(mountainId);
 
@@ -113,6 +110,63 @@ public class UserController {
 
             log.info("success to input status {}", u.getUsername());
         } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+        }
+
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+        return ResponseEntity.status(status).body(rm);
+    }
+
+    @PostMapping("/input-reply-status/{id}")
+    public HttpEntity<ResponseEnvelope> inputReplyStatus(@PathVariable String id,@RequestBody UserForm form){
+        long start = System.currentTimeMillis();
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
+
+        EntityManager em = statusDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try{
+            String replyStatus = form.getReplyStatus();
+            String statusId = form.getStatusId();
+
+            ValidationUtils.rejectIfEmptyField(" Cannot be empty",
+                    new String[][]{{"Status", replyStatus},{"Status Id", statusId}});
+
+            User u = userDao.findUser(id);
+
+            if(u == null){
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
+            }
+
+            String role = u.getRole().toString();
+
+            ReplyStatus rs = new ReplyStatus(statusId, u.getUsername(), role, replyStatus);
+
+            rs = replyStatusRepo.save(rs);
+
+            log.info("reply status success {}", u.getId());
+        }catch (WinterfellException e) {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }

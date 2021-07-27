@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MountainRepo extends JpaRepository<Mountain, String> {
 
-    Mountain findByMountainNameAndBasecampName(String mountainName, String basecampName);
+    Mountain findByMountainName(String mountainName);
 }

@@ -1,21 +1,20 @@
-package com.mountain.domain.form;
+package com.mountain.domain.response;
 
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-public class MountainForm implements Serializable {
+public class MountainResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String mountainId;
+    private String id;
+    private String photo;
     private String mountainName;
-    private String basecampName;
     private String description;
     private Integer height;
-    private String regulation;
     private String fullAddress;
-    private Double price;
-    private String updatedBy;
+
+
 }

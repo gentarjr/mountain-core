@@ -4,7 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -46,9 +46,9 @@ public class Member implements Serializable {
     private String fullAddress;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = " updated_date")
-    private Timestamp updatedDate;
+    private LocalDateTime updatedDate;
 
 }
