@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BasecampRepo extends JpaRepository<Basecamp, String> {
+    Basecamp findByBasecampName(String basecampName);
 }

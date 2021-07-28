@@ -5,7 +5,7 @@ import com.mountain.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, String> {
@@ -18,4 +18,6 @@ public interface UserRepo extends JpaRepository<User, String> {
     User findByPhoneNumber(String phoneNumber);
 
     User findByUsername(String username);
+
+    List<User> findByMountainIdAndRoleOrderByCreatedDateAsc(String mountainId, ERole role);
 }

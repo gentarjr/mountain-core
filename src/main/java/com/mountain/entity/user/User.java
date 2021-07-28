@@ -33,6 +33,9 @@ public class User implements Serializable {
     @Column(name = "username")
     private String username;
 
+    @Column(name = "photo")
+    private String photo;
+
     @Column(name = "first_name")
     private String firstName;
 

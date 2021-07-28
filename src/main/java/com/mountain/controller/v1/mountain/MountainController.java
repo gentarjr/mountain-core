@@ -278,7 +278,7 @@ public class MountainController {
 
             b = basecampRepo.save(b);
 
-            Path folderBasecampPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_STATUS_PATH
+            Path folderBasecampPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH
                     + "/" + mountainId, "/basecamp/" + basecampName);
             File folderBasecamp = folderBasecampPath.toFile();
             if (!folderBasecamp.exists() || !folderBasecamp.isDirectory()) {
@@ -383,8 +383,19 @@ public class MountainController {
                 body(rm);
     }
 
+    @GetMapping("/list-basecamp/{mountainId}")
+    public HttpEntity<ResponseEnvelope> listBascamp(@PathVariable String mountainId) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = mountainService.listBasecamp(mountainId);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
+        return ResponseEntity.status(status).body(rm);
+    }
+
     @PostMapping("/input-ranger/{id}")
-    public HttpEntity<ResponseEnvelope> inputRangers(@RequestBody UserForm form, @PathVariable String id) {
+    public HttpEntity<ResponseEnvelope> inputRangers(@RequestBody UserForm form, @PathVariable String id){
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
@@ -548,5 +559,27 @@ public class MountainController {
                 getMethodName(), start, end);
         return ResponseEntity.status(status).
                 body(rm);
+    }
+
+    @GetMapping("/list-ranger/{mountainId}")
+    public HttpEntity<ResponseEnvelope> listRanger(@PathVariable String mountainId) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = mountainService.listRanger(mountainId);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
+        return ResponseEntity.status(status).body(rm);
+    }
+
+    @GetMapping("/list-status-mountain/{mountainId}")
+    public HttpEntity<ResponseEnvelope> listStatusMountain(@PathVariable String mountainId) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = mountainService.listStatusMountain(mountainId);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
+        return ResponseEntity.status(status).body(rm);
     }
 }

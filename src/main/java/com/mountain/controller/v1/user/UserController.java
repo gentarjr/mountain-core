@@ -18,6 +18,7 @@ import com.mountain.repo.MountainRepo;
 import com.mountain.repo.ReplyStatusRepo;
 import com.mountain.repo.StatusRepo;
 import com.mountain.repo.UserRepo;
+import com.mountain.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import javax.persistence.EntityTransaction;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/v1/users")
@@ -41,6 +43,8 @@ import java.nio.file.Paths;
 public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(MountainController.class);
+
+    private final UserService userService;
 
     private final StatusRepo statusRepo;
     private final UserRepo userRepo;
@@ -81,31 +85,22 @@ public class UserController {
 
             Status s = new Status(u.getUsername(), role, statusUser);
             s.setUsersId(id);
-            s.setMountainId(mountainId);
+
+            if (!mountainId.equals("")) {
+                s.setMountainId(mountainId);
+            }
 
             if (!photo.isEmpty()) {
                 s.setPhoto(photoNew);
-                if (role.equals("USER")) {
-                    folderStatusPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_STATUS_PATH
-                            + "/" + mountainId, "/status/" + u.getUsername());
-                    File folderMountain = folderStatusPath.toFile();
-                    if (!folderMountain.exists() || !folderMountain.isDirectory()) {
-                        folderMountain.mkdir();
-                        logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
-                    }
-                    statusDao.saveDocStatus(folderStatusPath.toString(), s, photo);
-                } else if (role.equals("RANGER") || role.equals("SYSADMIN")) {
-                    folderStatusPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_STATUS_PATH
-                            + "/" + mountainId, "/status/" + u.getUsername());
-                    File folderMountain = folderStatusPath.toFile();
-                    if (!folderMountain.exists() || !folderMountain.isDirectory()) {
-                        folderMountain.mkdir();
-                        logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
-                    }
-                    statusDao.saveDocStatus(folderStatusPath.toString(), s, photo);
+                folderStatusPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_USER_PATH
+                        + "/" + id, "/status/" + s.getId());
+                File folderMountain = folderStatusPath.toFile();
+                if (!folderMountain.exists() || !folderMountain.isDirectory()) {
+                    folderMountain.mkdir();
+                    logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
                 }
+                statusDao.saveDocStatus(folderStatusPath.toString(), s, photo);
             }
-
             s = statusRepo.save(s);
 
             log.info("success to input status {}", u.getUsername());
@@ -137,8 +132,30 @@ public class UserController {
         return ResponseEntity.status(status).body(rm);
     }
 
+    @GetMapping("/list-status/{id}")
+    public HttpEntity<ResponseEnvelope> listStatus(@PathVariable String id) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = userService.listStatus(id);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
+        return ResponseEntity.status(status).body(rm);
+    }
+
+    @GetMapping("/list-status-user/{id}")
+    public HttpEntity<ResponseEnvelope> listStatusUser(@PathVariable String id) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = userService.listStatusUser(id);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
+        return ResponseEntity.status(status).body(rm);
+    }
+
     @PostMapping("/input-reply-status/{id}")
-    public HttpEntity<ResponseEnvelope> inputReplyStatus(@PathVariable String id,@RequestBody UserForm form){
+    public HttpEntity<ResponseEnvelope> inputReplyStatus(@PathVariable String id, @RequestBody UserForm form) {
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
@@ -146,16 +163,16 @@ public class UserController {
 
         EntityManager em = statusDao.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
-        try{
+        try {
             String replyStatus = form.getReplyStatus();
             String statusId = form.getStatusId();
 
             ValidationUtils.rejectIfEmptyField(" Cannot be empty",
-                    new String[][]{{"Status", replyStatus},{"Status Id", statusId}});
+                    new String[][]{{"Status", replyStatus}, {"Status Id", statusId}});
 
             User u = userDao.findUser(id);
 
-            if(u == null){
+            if (u == null) {
                 throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
             }
 
@@ -166,7 +183,7 @@ public class UserController {
             rs = replyStatusRepo.save(rs);
 
             log.info("reply status success {}", u.getId());
-        }catch (WinterfellException e) {
+        } catch (WinterfellException e) {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }

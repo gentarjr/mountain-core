@@ -17,6 +17,7 @@ public class UserResponse implements Serializable {
     private String id;
     private String nik;
     private String username;
+    private String photo;
     private String firstName;
     private String lastName;
     private String phoneNumber;
@@ -24,8 +25,13 @@ public class UserResponse implements Serializable {
     private String email;
     private ERole role;
     private String token;
+    private Boolean isDeleted;
     private String createdDate;
     private String updatedDate;
+
+    public UserResponse(){
+
+    }
 
 
     public UserResponse(String id, String nik, String username, String firstName, String lastName,
