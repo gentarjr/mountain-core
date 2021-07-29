@@ -3,9 +3,11 @@ package com.mountain.controller.v1.mountain;
 import com.mountain.dao.BasecampDao;
 import com.mountain.dao.MountainDao;
 import com.mountain.dao.UserDao;
+import com.mountain.domain.form.BankForm;
 import com.mountain.domain.form.BasecampForm;
 import com.mountain.domain.form.MountainForm;
 import com.mountain.domain.form.UserForm;
+import com.mountain.entity.detail.Bank;
 import com.mountain.entity.detail.Basecamp;
 import com.mountain.entity.detail.Mountain;
 import com.mountain.entity.role.Role;
@@ -20,10 +22,7 @@ import com.mountain.library.exceptions.WinterfellException;
 import com.mountain.library.helper.CodecUtils;
 import com.mountain.library.helper.LoggerUtils;
 import com.mountain.library.helper.ValidationUtils;
-import com.mountain.repo.BasecampRepo;
-import com.mountain.repo.MountainRepo;
-import com.mountain.repo.RoleRepo;
-import com.mountain.repo.UserRepo;
+import com.mountain.repo.*;
 import com.mountain.service.mountain.MountainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +59,7 @@ public class MountainController {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
     private final BasecampRepo basecampRepo;
+    private final BankRepo bankRepo;
 
     private final MountainDao mountainDao;
     private final BasecampDao basecampDao;
@@ -172,7 +172,7 @@ public class MountainController {
 
             Mountain mu = mountainDao.findMountain(mountainId);
 
-            if(mu == null){
+            if (mu == null) {
                 throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain not listed");
             }
 
@@ -250,6 +250,74 @@ public class MountainController {
             m = em.merge(m);
 
             log.info("update mountain success {}", m);
+        } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+        }
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().
+                getStackTrace()[1].
+                getMethodName(), start, end);
+        return ResponseEntity.status(status).
+                body(rm);
+    }
+
+    @PostMapping("/input-bank/{id}")
+    public HttpEntity<ResponseEnvelope> inputBank(@PathVariable String id, @RequestBody BankForm form) {
+        long start = System.currentTimeMillis();
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
+
+        EntityManager em = mountainDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            String mountainId = form.getMountainId();
+            String bankName = form.getBankName();
+            String accountName = form.getAccountName();
+            Integer accountNumber = form.getAccountNumber();
+
+            User u = userDao.findUser(id);
+
+            if(u == null){
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain not listed");
+            }
+            String role = u.getRole().toString();
+
+            Mountain m = mountainDao.findMountain(u.getMountainId());
+
+            if (m == null) {
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain not listed");
+            }
+
+            if(role.equals("USER") && !m.getId().equals(mountainId))
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Not Accept");
+
+            ValidationUtils.rejectIfEmptyField(" cannot be empty",
+                    new String[][]{{"Bank name", bankName}, {"Account name", accountName}});
+
+            Bank b = new Bank(bankName, accountName, accountNumber, u.getUsername());
+            b = bankRepo.save(b);
+
+            log.info("Mountain success input bank {}", b);
         } catch (WinterfellException e) {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
@@ -430,7 +498,7 @@ public class MountainController {
     }
 
     @PostMapping(value = "/input-photo-basecamp/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<ResponseEnvelope> editPhotoBasecamp(@PathVariable String id,String basecampId, MultipartFile photo) {
+    public HttpEntity<ResponseEnvelope> editPhotoBasecamp(@PathVariable String id, String basecampId, MultipartFile photo) {
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
@@ -513,7 +581,7 @@ public class MountainController {
     }
 
     @PostMapping("/input-ranger/{id}")
-    public HttpEntity<ResponseEnvelope> inputRangers(@RequestBody UserForm form, @PathVariable String id){
+    public HttpEntity<ResponseEnvelope> inputRangers(@RequestBody UserForm form, @PathVariable String id) {
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;

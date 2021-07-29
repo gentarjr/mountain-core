@@ -48,15 +48,6 @@ public class User implements Serializable {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "bank_name")
-    private String bankName;
-
-    @Column(name = "account_name")
-    private String accountName;
-
-    @Column(name = "account_number")
-    private Integer accountNumber;
-
     @Column(name = "pin")
     private String pin;
 

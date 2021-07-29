@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,8 +19,8 @@ public class RequestMountain implements Serializable {
     @Column(name = "users_id")
     private String usersId;
 
-    @Column(name = "transaction_id")
-    private String transactionId;
+    @Column(name = "basecamp_id")
+    private String basecampId;
 
     @Column(name = "equipment_id")
     private String equipmentId;
@@ -30,14 +31,35 @@ public class RequestMountain implements Serializable {
     @Column(name = "total_climber")
     private Integer totalClimber;
 
-    @Column(name = "request_mountain")
-    private String requestMountain;
+    @Column(name = "mountain_name")
+    private String mountainName;
 
-    @Column(name = "status")
-    private Boolean status;
+    @Column(name = "tracking_status")
+    private Integer trackingStatus;
 
-    @Column(name = "reason")
-    private String reason;
+    @Column(name = "price")
+    private Double price;
+
+    @Column(name = "payment")
+    private Double payment;
+
+    @Column(name = "account_name")
+    private String accountName;
+
+    @Column(name = "bank_name")
+    private String bankName;
+
+    @Column(name = "photo_payment")
+    private String photoPayment;
+
+    @Column(name = "name_payment_user")
+    private String namePaymentUser;
+
+    @Column(name = "bank_payment_user")
+    private String bank_payment_user;
+
+    @Column(name = "climber_date")
+    private LocalDate climberDate;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;

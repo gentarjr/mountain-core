@@ -13,6 +13,22 @@ create table mountain
     primary key (id)
 );
 
+create table bank
+(
+    id             varchar(255) not null,
+    mountain_id    varchar(255),
+    bank_name      varchar(255) not null,
+    account_name   varchar(255) not null,
+    account_number varchar(255) not null,
+    is_deleted     int null,
+    created_date   varchar(255),
+    created_by     varchar(255),
+    updated_date   varchar(255),
+    updated_by     varchar(255),
+    primary key (id),
+    foreign key (mountain_id) references mountain (id)
+);
+
 create table basecamp
 (
     id              varchar(255) not null,
@@ -58,9 +74,6 @@ CREATE table USERS
     last_name        varchar(30)        not null,
     address          varchar(255)       not null,
     email            varchar(30)        not null,
-    bank_name        varchar(15),
-    account_name     varchar(30),
-    account_number   int,
     pin              varchar(255)       not null,
     confirmation_pin varchar(255)       not null,
     role             varchar(20)        not null,
@@ -98,18 +111,6 @@ create table reply_status
     foreign key (status_id) references status (id)
 );
 
-CREATE table transaction
-(
-    id           varchar(255) primary key,
-    mountain     varchar(30) not null,
-    payment      int         not null,
-    climber_date TIMESTAMP   not null,
-    status       varchar(10),
-    reason       varchar(255),
-    created_date TIMESTAMP,
-    updated_date TIMESTAMP
-);
-
 CREATE table app
 (
     id      int primary key,
@@ -136,22 +137,27 @@ create table equipment
 
 create table request_mountain
 (
-    id               varchar(255) not null,
-    users_id         varchar(255) not null,
-    basecamp_id      varchar(255) not null,
-    transaction_id   varchar(255) not null,
-    equipment_id     varchar(255) not null,
-    tracking_id      varchar(255) not null,
-    total_climber    int          not null,
-    request_mountain varchar(30)  not null,
-    status           int          not null,
-    reason           varchar(255) not null,
-    created_date     TIMESTAMP,
-    updated_date     TIMESTAMP,
+    id                varchar(255) not null,
+    users_id          varchar(255) not null,
+    basecamp_id       varchar(255) not null,
+    equipment_id      varchar(255) not null,
+    tracking_id       varchar(255) not null,
+    total_climber     int          not null,
+    mountain_name     varchar(30)  not null,
+    tracking_status   int          not null,
+    price             int          not null,
+    payment           int,
+    account_name      varchar(255) not null,
+    bank_name         varchar(255) not null,
+    photo_payment     varchar(255) not null,
+    name_payment_user varchar(255),
+    bank_payment_user varchar(255),
+    climber_date      TIMESTAMP    not null,
+    created_date      TIMESTAMP,
+    updated_date      TIMESTAMP,
     primary key (id),
     FOREIGN key (users_id) REFERENCES users (id),
     FOREIGN key (basecamp_id) REFERENCES basecamp (id),
-    FOREIGN key (transaction_id) REFERENCES transaction (id),
     FOREIGN key (equipment_id) REFERENCES equipment (id),
     foreign key (tracking_id) references tracking (id)
 );
