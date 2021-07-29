@@ -1,11 +1,11 @@
 create table mountain
 (
     id            varchar(255) not null,
-    mountain_name varchar(30)  not null,
+    mountain_name varchar(30),
     photo         varchar(50),
-    description   varchar(255) not null,
-    height        int          not null,
-    full_address  varchar(255) not null,
+    description   varchar(255),
+    height        int,
+    full_address  varchar(255),
     created_date  TIMESTAMP,
     created_by    varchar(30),
     updated_date  TIMESTAMP,

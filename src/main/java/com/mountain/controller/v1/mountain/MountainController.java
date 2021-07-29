@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,8 +66,70 @@ public class MountainController {
 
     private final MountainService mountainService;
 
+    @PostMapping(value = "/input-photo-mountain/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<ResponseEnvelope> editPhotoMountain(@PathVariable String id, MultipartFile photo) {
+        long start = System.currentTimeMillis();
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Sukses");
+        EntityManager em = mountainDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            String photoNew = photo.getOriginalFilename();
+
+            ValidationUtils.rejectIfEmptyField(" Cannot be empty",
+                    new String[][]{{"Photo Profile", photoNew}});
+
+            User u = userDao.findUser(id);
+            if (u == null) {
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
+            }
+
+            Mountain m = new Mountain();
+            m.setPhoto(photoNew);
+
+            Path folderMountainPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH, m.getId());
+            File folderMountain = folderMountainPath.toFile();
+            if (!folderMountain.exists() || !folderMountain.isDirectory()) {
+                folderMountain.mkdir();
+                logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
+            }
+            mountainDao.saveDocMountain(folderMountainPath.toString(), m, photo);
+
+            m = em.merge(m);
+
+            log.info("input photo mountain {} success to input", m.getId());
+        } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+        }
+
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+
+        return ResponseEntity.status(status).body(rm);
+    }
+
     @PostMapping("/input-mountain/{id}")
-    public HttpEntity<ResponseEnvelope> inputMountain(MountainForm form, @PathVariable String id, @RequestParam("photo") MultipartFile photo) {
+    public HttpEntity<ResponseEnvelope> inputMountain(@RequestBody MountainForm form, @PathVariable String id) {
 
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
@@ -78,12 +141,11 @@ public class MountainController {
         try {
             User u = userDao.findUser(id);
 
+            String mountainId = form.getMountainId();
             String mountainName = form.getMountainName();
             String description = form.getDescription();
             Integer height = form.getHeight();
             String fullAddress = form.getFullAddress();
-
-            String photoNew = photo.getOriginalFilename();
 
             if (u == null) {
                 throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
@@ -108,19 +170,14 @@ public class MountainController {
                 throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain already registered");
             }
 
-            Mountain mountain = new Mountain(mountainName, description, height, fullAddress, u.getUsername());
-            mountain.setCreatedBy(u.getUsername());
+            Mountain mu = mountainDao.findMountain(mountainId);
 
-            if (!photoNew.equals("")) {
-                mountain.setPhoto(photoNew);
-                Path folderMountainPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH, mountain.getId());
-                File folderMountain = folderMountainPath.toFile();
-                if (!folderMountain.exists() || !folderMountain.isDirectory()) {
-                    folderMountain.mkdir();
-                    logger.info("User folder didn't exist, create one at {}.", folderMountain.getAbsolutePath());
-                }
-                mountainDao.saveDocMountain(folderMountainPath.toString(), mountain, photo);
+            if(mu == null){
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Mountain not listed");
             }
+
+            Mountain mountain = new Mountain(mountainName, description, height, fullAddress, u.getUsername());
+
             mountainRepo.save(mountain);
 
             u.setMountainId(mountain.getId());
@@ -235,7 +292,7 @@ public class MountainController {
     }
 
     @PostMapping("/input-basecamp/{id}")
-    public HttpEntity<ResponseEnvelope> inputBasecamp(BasecampForm form, @PathVariable String id, @RequestParam("photo") MultipartFile photo) {
+    public HttpEntity<ResponseEnvelope> inputBasecamp(@RequestBody BasecampForm form, @PathVariable String id) {
         long start = System.currentTimeMillis();
         HttpStatus status = HttpStatus.OK;
         ErrCode errCode = ErrCode.SUCCESS;
@@ -248,7 +305,6 @@ public class MountainController {
             String mountainId = form.getMountainId();
             String basecampName = form.getBasecampName();
             String description = form.getDescription();
-            String photoNew = photo.getOriginalFilename();
             String regulation = form.getRegulation();
             String fullAddress = form.getFullAddress();
             Double price = form.getPrice();
@@ -274,18 +330,8 @@ public class MountainController {
             Basecamp b = new Basecamp(basecampName, description, regulation, fullAddress, price);
             b.setCreatedBy(u.getUsername());
             b.setMountainId(mountainId);
-            b.setPhoto(photoNew);
 
             b = basecampRepo.save(b);
-
-            Path folderBasecampPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH
-                    + "/" + mountainId, "/basecamp/" + basecampName);
-            File folderBasecamp = folderBasecampPath.toFile();
-            if (!folderBasecamp.exists() || !folderBasecamp.isDirectory()) {
-                folderBasecamp.mkdir();
-                logger.info("User folder didn't exist, create one at {}.", folderBasecamp.getAbsolutePath());
-            }
-            basecampDao.saveDocBaseCamp(folderBasecampPath.toString(), b, photo);
 
             log.info("input basecamp success {}", b);
         } catch (WinterfellException e) {
@@ -383,8 +429,80 @@ public class MountainController {
                 body(rm);
     }
 
+    @PostMapping(value = "/input-photo-basecamp/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<ResponseEnvelope> editPhotoBasecamp(@PathVariable String id,String basecampId, MultipartFile photo) {
+        long start = System.currentTimeMillis();
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Sukses");
+        EntityManager em = mountainDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            String photoNew = photo.getOriginalFilename();
+
+            ValidationUtils.rejectIfEmptyField(" Cannot be empty",
+                    new String[][]{{"Photo Profile", photoNew}});
+
+            User u = userDao.findUser(id);
+            if (u == null) {
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
+            }
+
+            Basecamp b = basecampDao.findBasecamp(basecampId);
+            if (b == null) {
+                throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Basecamp not listed");
+            }
+
+            Path folderBasecampPath = Paths.get(AppConstant.BASE_FOLDER_PATH, AppConstant.FOLDER_MOUNTAIN_PATH
+                    + "/" + b.getMountainId(), "/basecamp/" + b.getBasecampName());
+            File folderBasecamp = folderBasecampPath.toFile();
+            if (!folderBasecamp.exists() || !folderBasecamp.isDirectory()) {
+                folderBasecamp.mkdir();
+                logger.info("User folder didn't exist, create one at {}.", folderBasecamp.getAbsolutePath());
+            }
+            transaction.begin();
+
+            basecampDao.saveDocBaseCamp(folderBasecampPath.toString(), b, photo);
+
+            b.setPhoto(photoNew);
+            b.setUpdatedDate(LocalDateTime.now());
+            b.setUpdatedBy(u.getUsername());
+
+            b = em.merge(b);
+
+            transaction.commit();
+            log.info("edit photo basecamp {} success to input", b.getId());
+        } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+        }
+
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+
+        return ResponseEntity.status(status).body(rm);
+    }
+
     @GetMapping("/list-basecamp/{mountainId}")
-    public HttpEntity<ResponseEnvelope> listBascamp(@PathVariable String mountainId) {
+    public HttpEntity<ResponseEnvelope> listBasecamp(@PathVariable String mountainId) {
         ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
 
         Map<String, Object> response = mountainService.listBasecamp(mountainId);
@@ -527,7 +645,6 @@ public class MountainController {
         EntityManager em = userDao.getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
-            String rangerId = (String) data.get("rangerId");
 
             User u = userDao.findUser(id);
 
