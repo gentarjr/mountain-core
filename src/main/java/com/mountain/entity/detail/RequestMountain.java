@@ -24,6 +24,9 @@ public class RequestMountain implements Serializable {
     @Column(name = "equipment_id")
     private String equipmentId;
 
+    @Column(name = "tracking_id")
+    private String trackingId;
+
     @Column(name = "total_climber")
     private Integer totalClimber;
 

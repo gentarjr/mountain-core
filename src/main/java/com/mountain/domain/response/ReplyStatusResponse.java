@@ -2,17 +2,14 @@ package com.mountain.domain.response;
 
 import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
 
 @Data
-public class StatusResponse {
+public class ReplyStatusResponse implements Serializable {
 
     private String id;
-    private String status;
     private String username;
     private String role;
-    private String photo;
+    private String reply;
     private String createdDate;
-
-    private List<ReplyStatusResponse> replyStatus;
 }

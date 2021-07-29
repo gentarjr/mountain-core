@@ -6,4 +6,6 @@ public interface UserService {
     Map<String, Object> listStatus(String id);
 
     Map<String, Object> listStatusUser(String id);
+
+    Map<String, Object> listReplyStatus(String statusId);
 }

@@ -112,7 +112,7 @@ public class MountainServiceImpl implements MountainService {
 
         List<Status> status = statusRepo.findByMountainIdOrderByCreatedDateAsc(mountainId);
 
-        List<StatusResponse> listStatusResponse = serviceDataList.listStatusMountain(status);
+        List<StatusResponse> listStatusResponse = serviceDataList.listStatus(status);
 
         result.put("status", listStatusResponse);
 

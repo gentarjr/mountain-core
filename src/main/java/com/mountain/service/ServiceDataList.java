@@ -1,24 +1,24 @@
 package com.mountain.service;
 
-import com.mountain.domain.response.BasecampResponse;
-import com.mountain.domain.response.MountainResponse;
-import com.mountain.domain.response.StatusResponse;
-import com.mountain.domain.response.UserResponse;
+import com.mountain.domain.response.*;
 import com.mountain.entity.detail.Basecamp;
 import com.mountain.entity.detail.Mountain;
+import com.mountain.entity.user.ReplyStatus;
 import com.mountain.entity.user.Status;
 import com.mountain.entity.user.User;
 import com.mountain.library.helper.DateUtils;
+import com.mountain.repo.ReplyStatusRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ServiceDataList {
+
+    private final ReplyStatusRepo replyStatusRepo;
 
     public List<MountainResponse> listMountain(List<Mountain> mountain) {
         List<MountainResponse> result = new ArrayList<>();
@@ -78,9 +78,9 @@ public class ServiceDataList {
         return result;
     }
 
-    public List<StatusResponse> listStatusMountain(List<Status> status) {
+    public List<StatusResponse> listStatus(List<Status> status) {
         List<StatusResponse> result = new ArrayList<>();
-        for(Status s : status){
+        for (Status s : status) {
             StatusResponse data = new StatusResponse();
             data.setId(s.getId());
             data.setStatus(s.getStatus());
@@ -91,5 +91,28 @@ public class ServiceDataList {
             result.add(data);
         }
         return result;
+    }
+
+    public StatusResponse listReplyStatus(Status s) {
+        StatusResponse data = new StatusResponse();
+        List<ReplyStatus> replyStatus = replyStatusRepo.findByStatusIdOrderByCreatedDateAsc(s.getId());
+        data.setId(s.getId());
+        data.setStatus(s.getStatus());
+        data.setUsername(s.getUsername());
+        data.setRole(s.getRole());
+        data.setPhoto("https://localhost:9009/v1/img" + s.getId() + "/status");
+        data.setCreatedDate(DateUtils.formatDateTimeOrEmptyString(s.getCreatedDate()));
+        List<ReplyStatusResponse> replyStatusResponse = new ArrayList<>();
+        for (ReplyStatus rs : replyStatus) {
+            ReplyStatusResponse data2 = new ReplyStatusResponse();
+            data2.setId(rs.getId());
+            data2.setUsername(rs.getUsername());
+            data2.setRole(rs.getRole());
+            data2.setReply(rs.getReply());
+            data2.setCreatedDate(DateUtils.formatDateTimeOrEmptyString(rs.getCreatedDate()));
+            replyStatusResponse.add(data2);
+        }
+        data.setReplyStatus(replyStatusResponse);
+        return data;
     }
 }

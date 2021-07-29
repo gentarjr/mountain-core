@@ -1,5 +1,6 @@
 package com.mountain.service.user.impl;
 
+import com.mountain.dao.StatusDao;
 import com.mountain.dao.UserDao;
 import com.mountain.domain.response.StatusResponse;
 import com.mountain.entity.user.Status;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final StatusDao statusDao;
 
     private final ServiceDataList serviceDataList;
 
@@ -35,13 +37,13 @@ public class UserServiceImpl implements UserService {
 
         User u = userDao.findUser(id);
 
-        if(u == null){
+        if (u == null) {
             throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
         }
 
         List<Status> status = statusRepo.findStatusUser();
 
-        List<StatusResponse> listResponseStatus = serviceDataList.listStatusMountain(status);
+        List<StatusResponse> listResponseStatus = serviceDataList.listStatus(status);
 
         result.put("status", listResponseStatus);
 
@@ -53,15 +55,34 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> result = new HashMap<>();
         User u = userDao.findUser(id);
 
-        if(u == null){
+        if (u == null) {
             throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "User not listed");
         }
 
         List<Status> status = statusRepo.findByUsersId(id);
 
-        List<StatusResponse> listResponseStatus = serviceDataList.listStatusMountain(status);
+        List<StatusResponse> listResponseStatus = serviceDataList.listStatus(status);
 
         result.put("status", listResponseStatus);
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> listReplyStatus(String statusId) {
+        Map<String, Object> result = new HashMap<>();
+
+        Status s = statusDao.findStatus(statusId);
+
+        if (s == null) {
+            throw new NonexistentEntityException(ErrCode.NOT_ACCEPTABLE, "Status not listed");
+        }
+
+        StatusResponse statusResponse = new StatusResponse();
+
+        statusResponse = serviceDataList.listReplyStatus(s);
+
+        result.put("data", statusResponse);
 
         return result;
     }

@@ -33,6 +33,19 @@ create table basecamp
     foreign key (mountain_id) references mountain (id)
 );
 
+create table tracking
+(
+    id           varchar(255) not null,
+    tracking_map varchar(30)  not null,
+    status       varchar(30)  not null,
+    reason       varchar(255) not null,
+    created_date timestamp,
+    created_by   varchar(30),
+    updated_date timestamp,
+    updated_by   varchar(30),
+    primary key (id)
+);
+
 CREATE table USERS
 (
     id               varchar(255)       not null,
@@ -128,6 +141,7 @@ create table request_mountain
     basecamp_id      varchar(255) not null,
     transaction_id   varchar(255) not null,
     equipment_id     varchar(255) not null,
+    tracking_id      varchar(255) not null,
     total_climber    int          not null,
     request_mountain varchar(30)  not null,
     status           int          not null,
@@ -138,7 +152,8 @@ create table request_mountain
     FOREIGN key (users_id) REFERENCES users (id),
     FOREIGN key (basecamp_id) REFERENCES basecamp (id),
     FOREIGN key (transaction_id) REFERENCES transaction (id),
-    FOREIGN key (equipment_id) REFERENCES equipment (id)
+    FOREIGN key (equipment_id) REFERENCES equipment (id),
+    foreign key (tracking_id) references tracking (id)
 );
 
 create table member

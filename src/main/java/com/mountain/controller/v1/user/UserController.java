@@ -1,6 +1,7 @@
 package com.mountain.controller.v1.user;
 
 import com.mountain.controller.v1.mountain.MountainController;
+import com.mountain.dao.ReplyStatusDao;
 import com.mountain.dao.StatusDao;
 import com.mountain.dao.UserDao;
 import com.mountain.domain.form.UserForm;
@@ -53,6 +54,7 @@ public class UserController {
 
     private final UserDao userDao;
     private final StatusDao statusDao;
+    private final ReplyStatusDao replyStatusDao;
 
     @PostMapping("/input-status/{id}")
     public HttpEntity<ResponseEnvelope> inputStatus(@PathVariable String id, UserForm form,
@@ -132,6 +134,65 @@ public class UserController {
         return ResponseEntity.status(status).body(rm);
     }
 
+    @DeleteMapping("/delete-status/{statusId}")
+    public HttpEntity<ResponseEnvelope> deleteStatus(@PathVariable String statusId) {
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+
+        long start = System.currentTimeMillis();
+
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
+        EntityManager em = statusDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            Status s = statusDao.findStatus(statusId);
+
+            if (s == null) {
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
+            }
+
+            transaction.begin();
+
+            ReplyStatus rs = replyStatusRepo.findByStatusId(s.getId());
+
+            replyStatusRepo.delete(rs);
+
+            s = em.merge(s);
+            em.remove(s);
+
+            transaction.commit();
+
+            log.info("delete status success {}", s);
+        } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+
+        }
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+
+        return ResponseEntity.status(status).body(rm);
+    }
+
     @GetMapping("/list-status/{id}")
     public HttpEntity<ResponseEnvelope> listStatus(@PathVariable String id) {
         ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
@@ -208,6 +269,72 @@ public class UserController {
 
         long end = System.currentTimeMillis();
         LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+        return ResponseEntity.status(status).body(rm);
+    }
+
+    @DeleteMapping("/delete-reply-status/{replyStatusId}")
+    public HttpEntity<ResponseEnvelope> deleteReplyStatus(@PathVariable String replyStatusId) {
+        HttpStatus status = HttpStatus.OK;
+        ErrCode errCode = ErrCode.SUCCESS;
+
+        long start = System.currentTimeMillis();
+
+        ResponseEnvelope rm = new ResponseEnvelope(errCode.getCode(), "Success");
+        EntityManager em = replyStatusDao.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            ReplyStatus rs = replyStatusDao.findReplyStatus(replyStatusId);
+
+            if (rs == null) {
+                throw new NonexistentEntityException(ErrCode.NO_CONTENT, "User not listed");
+            }
+
+            transaction.begin();
+
+            rs = em.merge(rs);
+            em.remove(rs);
+
+            transaction.commit();
+
+            log.info("delete reply status success {}", rs);
+        } catch (WinterfellException e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(e.getErrCode().getCode());
+            rm.setMessage(e.getMessage());
+            log.warn("Exception Caught :", e);
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            status = HttpStatus.CONFLICT;
+            rm.setCode(ErrCode.BAD_REQUEST.getCode());
+            rm.setMessage(ErrCode.BAD_REQUEST.getMessage());
+
+            log.warn("Exception Caught :", e);
+
+        } finally {
+            if (em.isOpen()) {
+                em.close();
+            }
+
+        }
+        long end = System.currentTimeMillis();
+        LoggerUtils.logTime(log, Thread.currentThread().getStackTrace()[1].getMethodName(), start, end);
+
+        return ResponseEntity.status(status).body(rm);
+    }
+
+    @GetMapping("/list-reply-status/{statusId}")
+    public HttpEntity<ResponseEnvelope> listReplyStatus(@PathVariable String statusId) {
+        ResponseEnvelope rm = new ResponseEnvelope(ErrCode.SUCCESS.getCode(), ErrCode.SUCCESS.getMessage());
+
+        Map<String, Object> response = userService.listReplyStatus(statusId);
+
+        HttpStatus status = HttpStatus.OK;
+        rm.setData(response);
         return ResponseEntity.status(status).body(rm);
     }
 }
