@@ -1,3 +1,4 @@
+//script query create table
 create table mountain
 (
     id            varchar(255) not null,
